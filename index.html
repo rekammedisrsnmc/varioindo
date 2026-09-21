@@ -1,89 +1,634 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>Permintaan Resume Medis</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    h2 {
-      margin-bottom: 20px;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-      font-weight: bold;
-    }
-    input, button {
-      margin-top: 5px;
-      padding: 8px;
-      width: 100%;
-      max-width: 400px;
-      box-sizing: border-box;
-    }
-    button {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EPS-TOPIK 쓰기 | Ujian Bahasa Korea</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{
+  --blue:#1e5fa8;
+  --blue-dark:#154a82;
+  --blue-light:#e8f0fa;
+  --bg:#f5f7fa;
+  --border:#d0d7e2;
+  --text:#1a1a1a;
+  --shadow:0 4px 16px rgba(0,0,0,.08);
+  --red:#d9534f;
+  --green:#2fa36b;
+  --yellow:#f0ad4e;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI','Malgun Gothic',-apple-system,sans-serif;}
+body{background:var(--bg);min-height:100vh;color:var(--text);}
+
+.exam-paper{
+  max-width:800px;
+  margin:30px auto;
+  background:#fff;
+  box-shadow:0 8px 30px rgba(0,0,0,.12);
+  border-radius:4px;
+  padding:50px 60px;
+}
+.exam-title{
+  text-align:center;
+  font-size:15px;
+  color:#333;
+  margin-bottom:8px;
+  letter-spacing:0.5px;
+}
+.exam-heading{
+  text-align:center;
+  font-size:22px;
+  font-weight:700;
+  padding:12px 0;
+  border-top:2px solid #333;
+  border-bottom:2px solid #333;
+  margin:15px 0 30px 0;
+  letter-spacing:3px;
+}
+.question{margin-bottom:32px;}
+.question-num{font-size:15px;font-weight:700;color:#333;margin-bottom:12px;}
+.question-num::after{content:'.';}
+
+.question-body{
+  display:flex;
+  gap:24px;
+  align-items:flex-start;
+  padding-left:20px;
+}
+.question-media{
+  flex-shrink:0;
+  width:220px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+}
+.question-media img{
+  max-width:100%;
+  max-height:180px;
+  border-radius:4px;
+  object-fit:contain;
+}
+.question-text{
+  font-size:15px;
+  line-height:1.8;
+  color:#222;
+  margin-bottom:10px;
+}
+.question-content{flex:1;min-width:0;}
+.question-media audio{width:100%;margin-top:8px;}
+
+.options{
+  list-style:none;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px 20px;
+  margin-top:12px;
+}
+.options.vertical{grid-template-columns:1fr;}
+.options li{
+  font-size:15px;
+  line-height:1.6;
+  color:#333;
+  padding:6px 10px;
+  border-radius:6px;
+  cursor:pointer;
+  transition:0.15s;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  border:2px solid transparent;
+  user-select:none;
+}
+.options li:hover{background:var(--blue-light);}
+.options li.selected{
+  background:var(--blue-light);
+  border-color:var(--blue);
+  font-weight:600;
+}
+.options li .circle{
+  font-size:15px;
+  color:#333;
+  flex-shrink:0;
+}
+.options li.selected .circle{color:var(--blue);}
+
+.fill-input{
+  width:100%;
+  padding:10px 14px;
+  border:2px solid var(--border);
+  border-radius:6px;
+  font-size:15px;
+  margin-top:10px;
+  font-family:inherit;
+}
+.fill-input:focus{outline:none;border-color:var(--blue);}
+
+.nav-bar{
+  max-width:800px;
+  margin:0 auto 30px;
+  padding:0 60px;
+  display:flex;
+  gap:12px;
+  justify-content:space-between;
+  flex-wrap:wrap;
+}
+.btn{
+  padding:11px 24px;
+  border:none;
+  border-radius:6px;
+  font-weight:600;
+  font-size:14px;
+  cursor:pointer;
+  transition:0.2s;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-family:inherit;
+}
+.btn:disabled{opacity:0.4;cursor:not-allowed;}
+.btn-primary{background:var(--blue);color:#fff;}
+.btn-primary:hover:not(:disabled){background:var(--blue-dark);}
+.btn-secondary{background:#e4e8ee;color:#333;}
+.btn-secondary:hover:not(:disabled){background:#d0d7e2;}
+.btn-success{background:var(--green);color:#fff;}
+.btn-success:hover{background:#1f7f53;}
+.btn-danger{background:var(--red);color:#fff;}
+
+.exam-info{
+  max-width:800px;
+  margin:20px auto 0;
+  padding:16px 24px;
+  background:#fff;
+  border-radius:8px;
+  box-shadow:var(--shadow);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:16px;
+  flex-wrap:wrap;
+}
+.exam-info .item{font-size:14px;color:#555;}
+.exam-info .item strong{color:var(--blue-dark);font-size:16px;}
+.timer{
+  background:var(--blue);
+  color:#fff;
+  padding:8px 18px;
+  border-radius:30px;
+  font-weight:700;
+  font-size:16px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.timer.warning{background:var(--yellow);}
+.timer.danger{background:var(--red);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.75}}
+
+.progress-wrap{
+  max-width:800px;
+  margin:12px auto 0;
+  height:6px;
+  background:#e4e8ee;
+  border-radius:6px;
+  overflow:hidden;
+}
+.progress-fill{
+  height:100%;
+  background:var(--blue);
+  width:0%;
+  transition:width 0.3s;
+}
+
+.spinner-container{text-align:center;padding:100px 20px;}
+.spinner{
+  display:inline-block;
+  width:44px;height:44px;
+  border:4px solid #e4e8ee;
+  border-top-color:var(--blue);
+  border-radius:50%;
+  animation:spin 0.8s linear infinite;
+}
+@keyframes spin{100%{transform:rotate(360deg)}}
+.spinner-container p{margin-top:14px;color:#888;}
+
+.result-wrap{
+  max-width:800px;
+  margin:30px auto;
+  padding:40px;
+  background:#fff;
+  border-radius:12px;
+  box-shadow:var(--shadow);
+  text-align:center;
+}
+.result-wrap h1{color:var(--blue-dark);margin-bottom:8px;}
+.result-wrap .sub{color:#888;margin-bottom:24px;}
+.score-big{
+  width:160px;height:160px;
+  border-radius:50%;
+  background:var(--blue);
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  margin:0 auto 24px;
+  box-shadow:0 8px 30px rgba(30,95,168,0.35);
+}
+.score-big .num{font-size:52px;font-weight:800;line-height:1;}
+.score-big .lbl{font-size:13px;opacity:0.9;margin-top:4px;letter-spacing:2px;}
+.stat-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  margin:24px 0;
+}
+.stat{padding:18px;background:#f5f7fa;border-radius:10px;}
+.stat .n{font-size:26px;font-weight:800;}
+.stat .l{font-size:12px;color:#888;margin-top:4px;}
+.stat.green .n{color:var(--green);}
+.stat.red .n{color:var(--red);}
+.stat.gray .n{color:#888;}
+
+.review-item{
+  text-align:left;
+  background:#fff;
+  border:1.5px solid var(--border);
+  border-radius:10px;
+  padding:18px;
+  margin-bottom:12px;
+}
+.review-item.correct{border-left:5px solid var(--green);}
+.review-item.wrong{border-left:5px solid var(--red);}
+.review-item .rhead{
+  display:flex;justify-content:space-between;
+  font-size:13px;font-weight:700;margin-bottom:8px;
+}
+.review-item .rhead .ok{color:var(--green);}
+.review-item .rhead .no{color:var(--red);}
+.review-item .rq{font-size:14px;margin-bottom:10px;color:#333;}
+.review-item .ra{font-size:13px;color:#555;background:#f5f7fa;padding:8px 12px;border-radius:6px;}
+
+footer{
+  text-align:center;
+  padding:24px 20px;
+  color:#999;
+  font-size:13px;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(15px)}to{opacity:1}}
+.fade{animation:fadeUp .4s ease;}
+@media(max-width:700px){
+  .exam-paper{padding:30px 20px;margin:15px;}
+  .nav-bar{padding:0 20px;}
+  .question-body{flex-direction:column;padding-left:10px;}
+  .question-media{width:100%;}
+  .options{grid-template-columns:1fr;}
+  .stat-grid{grid-template-columns:1fr;}
+}
+</style>
 </head>
 <body>
-  <h2>Form Permintaan Resume Medis</h2>
-  <form id="resumeForm">
-    <label>Nama Pasien:</label>
-    <input type="text" name="nama_pasien" required>
 
-    <label>Tanggal Lahir:</label>
-    <input type="date" name="tgl_lahir" required>
+<div class="exam-info" id="examInfo" style="display:none;">
+  <div class="item">📝 Soal <strong id="curNum">1</strong> / <strong id="totNum">-</strong></div>
+  <div class="item">✅ Terjawab: <strong id="answeredNum">0</strong></div>
+  <div class="timer" id="timerBox">
+    <i class="fas fa-clock"></i> <span id="timerText">--:--</span>
+  </div>
+</div>
+<div class="progress-wrap" id="progressWrap" style="display:none;">
+  <div class="progress-fill" id="progressFill"></div>
+</div>
 
-    <label>Jenis Kelamin:</label>
-    <input type="text" name="jk" required>
+<div id="app">
+  <div class="spinner-container">
+    <div class="spinner"></div>
+    <p>Memuat soal ujian...</p>
+  </div>
+</div>
 
-    <label>NO. Rekam Medis:</label>
-    <input type="text" name="no_rm" required>
+<footer>
+  한국어능력시험 (EPS-TOPIK) — 쓰기 (20 문항)
+</footer>
 
-    <label>Alamat:</label>
-    <input type="text" name="alamat" required>
+<script>
+// ========== KONFIGURASI ==========
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzb-_z3l8au2MKiqHzJhffCKWPJL53NrBSMsg80YQ0QfQVDDioPF1ksPW6suy4YiMs/exec';
 
-    <label>Nama Petugas Rekam Medis:</label>
-    <input type="text" name="petugas" required>
+// ========== STATE ==========
+let questions = [];
+let currentIndex = 0;
+let answers = {};
+let startTime = null;
+let timerInterval = null;
+let examDuration = 20 * 60;
+let isFinished = false;
 
-    <label>Tanggal Permintaan:</label>
-    <input type="date" name="tgl_permintaan" required>
+const CIRCLES = { '1':'①', '2':'②', '3':'③', '4':'④' };
 
-    <button type="submit">Kirim Permintaan</button>
-  </form>
+// ========== LOAD ==========
+function loadQuestions() {
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="spinner-container">
+      <div class="spinner"></div>
+      <p>Memuat soal ujian...</p>
+    </div>
+  `;
 
-  <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbxsaKlHtmLqDvVBTILWF7mYLuy36S_OHxVdBTIDuUQ/dev";
-
-    document.getElementById("resumeForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-
-      const formData = new FormData(e.target);
-
-      fetch(scriptURL, {
-        method: "POST",
-        body: formData
-        mode: "no-cors"
-      })
-      .then(res => res.text())
-      .then(msg => {
-        alert("✅ " + msg);
-        e.target.reset();
-      })
-      .catch(err => {
-        console.error("Fetch error:", err);
-        alert("❌ Gagal mengirim: " + err.message);
-      });
+  fetch(APPS_SCRIPT_URL + '?t=' + Date.now())
+    .then(res => {
+      if (!res.ok) throw new Error('Network error');
+      return res.json();
+    })
+    .then(data => {
+      if (data && data.length > 0) {
+        questions = data;
+        startExam();
+      } else {
+        app.innerHTML = `
+          <div class="result-wrap">
+            <h1>📭 Belum Ada Soal</h1>
+            <p class="sub">Silakan tambahkan soal melalui Admin Panel</p>
+            <a href="admin.html" class="btn btn-primary" style="text-decoration:none;">
+              <i class="fas fa-user-cog"></i> Buka Admin Panel
+            </a>
+          </div>
+        `;
+      }
+    })
+    .catch(() => {
+      app.innerHTML = `
+        <div class="result-wrap">
+          <h1>⚠️ Gagal Memuat Soal</h1>
+          <p class="sub">Periksa koneksi internet Anda</p>
+          <button class="btn btn-primary" onclick="loadQuestions()">
+            <i class="fas fa-redo"></i> Coba Lagi
+          </button>
+        </div>
+      `;
     });
-  </script>
+}
+
+// ========== START ==========
+function startExam() {
+  currentIndex = 0;
+  answers = {};
+  isFinished = false;
+  startTime = Date.now();
+  examDuration = Math.max(questions.length * 60, 300);
+
+  document.getElementById('examInfo').style.display = 'flex';
+  document.getElementById('progressWrap').style.display = 'block';
+  document.getElementById('totNum').textContent = questions.length;
+
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(updateTimer, 1000);
+
+  renderQuestion();
+}
+
+// ========== TIMER ==========
+function updateTimer() {
+  if (isFinished) return;
+  const elapsed = Math.floor((Date.now() - startTime) / 1000);
+  const remaining = examDuration - elapsed;
+
+  const box = document.getElementById('timerBox');
+  const text = document.getElementById('timerText');
+
+  if (remaining <= 0) {
+    clearInterval(timerInterval);
+    finishExam(true);
+    return;
+  }
+
+  const m = Math.floor(remaining / 60);
+  const s = remaining % 60;
+  text.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+
+  box.classList.remove('warning','danger');
+  if (remaining <= 60) box.classList.add('danger');
+  else if (remaining <= 300) box.classList.add('warning');
+}
+
+// ========== RENDER ==========
+function renderQuestion() {
+  const app = document.getElementById('app');
+  const q = questions[currentIndex];
+  const total = questions.length;
+
+  document.getElementById('curNum').textContent = currentIndex + 1;
+  const answeredCount = Object.keys(answers).filter(k => answers[k] !== '' && answers[k] !== undefined).length;
+  document.getElementById('answeredNum').textContent = answeredCount;
+  const pct = ((currentIndex + 1) / total) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+
+  let mediaHtml = '';
+  if (q.gambar) mediaHtml += `<img src="${q.gambar}" alt="gambar soal" onerror="this.style.display='none'">`;
+  if (q.audio)  mediaHtml += `<audio controls preload="metadata" style="width:100%;"><source src="${q.audio}"></audio>`;
+
+  let optionsHtml = '';
+  if (q.section === 'isian') {
+    const val = (answers[currentIndex] || '').replace(/"/g, '&quot;');
+    optionsHtml = `
+      <input type="text" class="fill-input" id="fillInput"
+             placeholder="답을 입력하세요..." value="${val}"
+             oninput="saveAnswer(this.value)">
+    `;
+  } else {
+    const opts = [
+      { n:'1', t:q.opsiA },
+      { n:'2', t:q.opsiB },
+      { n:'3', t:q.opsiC },
+      { n:'4', t:q.opsiD }
+    ].filter(o => o.t);
+
+    const cls = (q.section === 'pilihan_gambar') ? '' : 'vertical';
+
+    optionsHtml = `<ul class="options ${cls}">`;
+    opts.forEach(o => {
+      const sel = String(answers[currentIndex]) === o.n ? 'selected' : '';
+      optionsHtml += `
+        <li class="${sel}" onclick="selectAnswer('${o.n}')">
+          <span class="circle">${CIRCLES[o.n]}</span>
+          <span>${o.t}</span>
+        </li>
+      `;
+    });
+    optionsHtml += '</ul>';
+  }
+
+  const hasMedia = mediaHtml !== '';
+  const bodyHtml = hasMedia
+    ? `<div class="question-body">
+         <div class="question-media">${mediaHtml}</div>
+         <div class="question-content">
+           ${q.soal ? `<div class="question-text">${q.soal}</div>` : ''}
+           ${optionsHtml}
+         </div>
+       </div>`
+    : `<div class="question-body" style="padding-left:0;">
+         <div class="question-content">
+           ${q.soal ? `<div class="question-text">${q.soal}</div>` : ''}
+           ${optionsHtml}
+         </div>
+       </div>`;
+
+  const isFirst = currentIndex === 0;
+  const isLast  = currentIndex === total - 1;
+
+  app.innerHTML = `
+    <div class="exam-paper fade" id="paper">
+      <div class="exam-title">고용허가제 한국어능력시험 (EPS-TOPIK)</div>
+      <div class="exam-heading">읽기 ( ${total} 문항 )</div>
+      <div class="question">
+        <div class="question-num">${currentIndex + 1}</div>
+        ${bodyHtml}
+      </div>
+    </div>
+    <div class="nav-bar">
+      <button class="btn btn-secondary" onclick="prevQuestion()" ${isFirst ? 'disabled' : ''}>
+        <i class="fas fa-arrow-left"></i> 이전
+      </button>
+      ${isLast
+        ? `<button class="btn btn-success" onclick="finishExam(false)">
+             <i class="fas fa-check"></i> 제출 & 결과보기
+           </button>`
+        : `<button class="btn btn-primary" onclick="nextQuestion()">
+             다음 <i class="fas fa-arrow-right"></i>
+           </button>`}
+    </div>
+  `;
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+// ========== SELECT ==========
+function selectAnswer(num) {
+  answers[currentIndex] = num;
+  document.querySelectorAll('.options li').forEach(li => {
+    const circle = li.querySelector('.circle').textContent;
+    li.classList.toggle('selected', circle === CIRCLES[num]);
+  });
+  updateAnsweredCount();
+}
+
+function saveAnswer(val) {
+  answers[currentIndex] = val;
+  updateAnsweredCount();
+}
+
+function updateAnsweredCount() {
+  const n = Object.keys(answers).filter(k => answers[k] !== '' && answers[k] !== undefined).length;
+  document.getElementById('answeredNum').textContent = n;
+}
+
+// ========== NAV ==========
+function nextQuestion() { if (currentIndex < questions.length - 1) { currentIndex++; renderQuestion(); } }
+function prevQuestion() { if (currentIndex > 0) { currentIndex--; renderQuestion(); } }
+
+// ========== FINISH ==========
+function finishExam(timeUp) {
+  if (isFinished) return;
+  if (!timeUp && !confirm('Yakin ingin menyelesaikan ujian dan lihat hasil?')) return;
+
+  isFinished = true;
+  clearInterval(timerInterval);
+
+  let correct = 0, wrong = 0, blank = 0;
+  questions.forEach((q, i) => {
+    const ua = (answers[i] || '').toString().trim();
+    const ca = (q.jawaban || '').toString().trim();
+    if (!ua) { blank++; return; }
+    if (q.section === 'isian') {
+      if (ua.toLowerCase() === ca.toLowerCase()) correct++; else wrong++;
+    } else {
+      if (ua === ca) correct++; else wrong++;
+    }
+  });
+
+  const total = questions.length;
+  const score = Math.round((correct / total) * 100);
+
+  document.getElementById('examInfo').style.display = 'none';
+  document.getElementById('progressWrap').style.display = 'none';
+
+  let grade = 'A', color = '#2fa36b';
+  if (score < 90) { grade = 'B'; color = '#2fa36b'; }
+  if (score < 80) { grade = 'C'; color = '#f0ad4e'; }
+  if (score < 70) { grade = 'D'; color = '#f0ad4e'; }
+  if (score < 60) { grade = 'E'; color = '#d9534f'; }
+
+  document.getElementById('app').innerHTML = `
+    <div class="result-wrap fade">
+      <h1>Ujian Selesai 🎉</h1>
+      <p class="sub">${timeUp ? '⏰ Waktu habis' : 'Terima kasih telah mengerjakan'}</p>
+
+      <div class="score-big" style="background:${color}">
+        <div class="num">${score}</div>
+        <div class="lbl">SCORE</div>
+      </div>
+      <p style="font-size:18px;font-weight:700;color:${color};margin-bottom:20px;">Grade ${grade}</p>
+
+      <div class="stat-grid">
+        <div class="stat green"><div class="n">${correct}</div><div class="l">정답 (Benar)</div></div>
+        <div class="stat red"><div class="n">${wrong}</div><div class="l">오답 (Salah)</div></div>
+        <div class="stat gray"><div class="n">${blank}</div><div class="l">미응답 (Kosong)</div></div>
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:10px;">
+        <button class="btn btn-primary" onclick="location.reload()">
+          <i class="fas fa-redo"></i> Ulangi
+        </button>
+        <button class="btn btn-secondary" onclick="showReview()">
+          <i class="fas fa-list"></i> Review Jawaban
+        </button>
+      </div>
+
+      <div id="reviewBox" style="display:none;margin-top:28px;"></div>
+    </div>
+  `;
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+// ========== REVIEW ==========
+function showReview() {
+  const box = document.getElementById('reviewBox');
+  if (box.style.display === 'block') { box.style.display = 'none'; return; }
+
+  let html = '';
+  questions.forEach((q, i) => {
+    const ua = (answers[i] || '').toString().trim();
+    const ca = (q.jawaban || '').toString().trim();
+    let ok = false;
+    if (q.section === 'isian') ok = ua.toLowerCase() === ca.toLowerCase();
+    else ok = ua === ca;
+
+    const dispUA = (q.section === 'isian') ? (ua || '(kosong)') : (CIRCLES[ua] || ua || '(kosong)');
+    const dispCA = (q.section === 'isian') ? ca : (CIRCLES[ca] || ca);
+
+    html += `
+      <div class="review-item ${ok ? 'correct' : 'wrong'}">
+        <div class="rhead">
+          <span>Soal ${i + 1}</span>
+          <span class="${ok ? 'ok' : 'no'}">${ok ? '✓ Benar' : '✗ Salah'}</span>
+        </div>
+        <div class="rq">${q.soal || '(gambar/audio)'}</div>
+        <div class="ra">
+          Jawaban Anda: <strong>${dispUA}</strong><br>
+          Jawaban Benar: <strong style="color:#2fa36b;">${dispCA}</strong>
+          ${q.pembahasan ? `<br><br><strong>Pembahasan:</strong> ${q.pembahasan}` : ''}
+        </div>
+      </div>
+    `;
+  });
+  box.innerHTML = html;
+  box.style.display = 'block';
+}
+
+// ========== INIT ==========
+loadQuestions();
+</script>
 </body>
 </html>
