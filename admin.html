@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin Soal EPS-TOPIK</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{
+  --blue:#1e5fa8;
+  --blue-dark:#154a82;
+  --blue-light:#e8f0fa;
+  --bg:#f5f7fa;
+  --border:#d0d7e2;
+  --red:#d9534f;
+  --green:#2fa36b;
+  --yellow:#f0ad4e;
+  --shadow:0 4px 16px rgba(0,0,0,.08);
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI','Malgun Gothic',-apple-system,sans-serif;}
+body{background:var(--bg);min-height:100vh;}
+
+.topbar{
+  background:#fff;
+  padding:16px 24px;
+  box-shadow:var(--shadow);
+  display:flex;
+  align-items:center;
+  gap:16px;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+.topbar h1{font-size:18px;color:var(--blue-dark);display:flex;align-items:center;gap:10px;}
+.topbar h1 i{color:var(--blue);}
+.topbar .spacer{flex:1;}
+
+.wrap{max-width:1100px;margin:24px auto;padding:0 20px;}
+.card{
+  background:#fff;
+  border-radius:12px;
+  padding:28px;
+  box-shadow:var(--shadow);
+  margin-bottom:20px;
+}
+.card h2{
+  font-size:18px;
+  color:var(--blue-dark);
+  margin-bottom:20px;
+  display:flex;align-items:center;gap:10px;
+  padding-bottom:12px;
+  border-bottom:2px solid var(--blue-light);
+}
+.form-group{margin-bottom:16px;}
+.form-group label{
+  font-size:13px;font-weight:600;color:#333;
+  display:block;margin-bottom:6px;
+}
+.form-group label .req{color:var(--red);}
+.form-group input, .form-group select, .form-group textarea{
+  width:100%;padding:10px 14px;
+  border:1.5px solid var(--border);border-radius:8px;
+  font-size:14px;font-family:inherit;transition:0.2s;
+}
+.form-group textarea{min-height:70px;resize:vertical;}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus{
+  outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(30,95,168,0.15);
+}
+.form-group .hint{font-size:11px;color:#888;margin-top:4px;}
+
+.row-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.row-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+
+.upload-box{
+  border:2px dashed var(--border);
+  border-radius:8px;
+  padding:16px;
+  text-align:center;
+  transition:0.2s;
+  cursor:pointer;
+}
+.upload-box:hover{border-color:var(--blue);background:var(--blue-light);}
+.upload-box i{font-size:24px;color:var(--blue);display:block;margin-bottom:6px;}
+.upload-box .txt{font-size:13px;color:#666;}
+.upload-box input[type=file]{display:none;}
+.preview{margin-top:10px;position:relative;}
+.preview img{max-width:100%;max-height:150px;border-radius:6px;display:block;margin:auto;}
+.preview audio{width:100%;}
+.preview .rm{
+  position:absolute;top:-8px;right:-8px;
+  background:var(--red);color:#fff;border:none;
+  width:26px;height:26px;border-radius:50%;
+  cursor:pointer;font-size:12px;
+}
+.upload-status{
+  font-size:12px;
+  margin-top:6px;
+  padding:4px 10px;
+  border-radius:6px;
+  display:inline-block;
+}
+.upload-status.ok{background:#e8f5ee;color:#1f7f53;}
+.upload-status.loading{background:#fff5e0;color:#8a6a1a;}
+.upload-status.err{background:#fde8e8;color:#a33;}
+
+.btn{
+  padding:10px 20px;border:none;border-radius:8px;
+  font-weight:600;font-size:14px;cursor:pointer;
+  transition:0.2s;display:inline-flex;align-items:center;gap:8px;
+  font-family:inherit;
+}
+.btn:disabled{opacity:0.5;cursor:not-allowed;}
+.btn-primary{background:var(--blue);color:#fff;}
+.btn-primary:hover:not(:disabled){background:var(--blue-dark);}
+.btn-success{background:var(--green);color:#fff;}
+.btn-success:hover{background:#1f7f53;}
+.btn-danger{background:var(--red);color:#fff;}
+.btn-danger:hover{background:#c9302c;}
+.btn-warning{background:var(--yellow);color:#fff;}
+.btn-warning:hover{background:#ec971f;}
+.btn-secondary{background:#e4e8ee;color:#333;}
+.btn-secondary:hover{background:#d0d7e2;}
+.btn-sm{padding:6px 12px;font-size:12px;}
+
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;}
+
+.q-list{margin-top:6px;}
+.q-item{
+  border:1.5px solid var(--border);
+  border-radius:10px;
+  padding:14px 16px;
+  margin-bottom:10px;
+  display:flex;gap:14px;align-items:flex-start;
+  transition:0.2s;
+}
+.q-item:hover{background:#fafbfc;}
+.q-item .num{
+  background:var(--blue);color:#fff;
+  width:32px;height:32px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:14px;flex-shrink:0;
+}
+.q-item .info{flex:1;min-width:0;}
+.q-item .info .txt{font-size:14px;color:#333;margin-bottom:4px;word-break:break-word;}
+.q-item .info .meta{font-size:12px;color:#888;display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
+.q-item .info .meta .tag{
+  background:var(--blue-light);color:var(--blue-dark);
+  padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;
+}
+.q-item .info .meta .tag.audio{background:#fde8e8;color:#a33;}
+.q-item .info .meta .tag.img{background:#e8f5ee;color:#1f7f53;}
+.q-item .info .meta .tag.ans{background:#fff5e0;color:#8a6a1a;}
+.q-item .thumb{
+  width:60px;height:60px;object-fit:cover;
+  border-radius:6px;flex-shrink:0;
+}
+.q-item .btns{display:flex;flex-direction:column;gap:6px;flex-shrink:0;}
+
+.jawaban-radios{display:flex;gap:10px;flex-wrap:wrap;}
+.jawaban-radios label{
+  flex:1;min-width:70px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:12px;
+  border:2px solid var(--border);
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:600;
+  font-size:15px;
+  transition:0.2s;
+  background:#fff;
+}
+.jawaban-radios label:hover{border-color:var(--blue);background:var(--blue-light);}
+.jawaban-radios input[type=radio]{display:none;}
+.jawaban-radios label.checked{
+  background:var(--blue);
+  border-color:var(--blue-dark);
+  color:#fff;
+}
+
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:var(--blue-dark);color:#fff;
+  padding:12px 24px;border-radius:30px;
+  font-size:14px;font-weight:500;
+  box-shadow:0 8px 24px rgba(0,0,0,0.2);
+  opacity:0;pointer-events:none;transition:0.3s;
+  z-index:100;
+}
+.toast.show{opacity:1;}
+.toast.error{background:var(--red);}
+.toast.success{background:var(--green);}
+
+.spinner{
+  display:inline-block;width:18px;height:18px;
+  border:3px solid rgba(255,255,255,0.4);
+  border-top-color:#fff;border-radius:50%;
+  animation:spin 0.7s linear infinite;vertical-align:middle;
+}
+.spinner.dark{border-color:rgba(0,0,0,0.15);border-top-color:var(--blue);}
+@keyframes spin{100%{transform:rotate(360deg)}}
+.loading-block{text-align:center;padding:40px;color:#888;}
+.loading-block .spinner{width:36px;height:36px;border-width:4px;}
+.empty-block{text-align:center;padding:40px;color:#888;}
+.empty-block i{font-size:44px;opacity:0.3;display:block;margin-bottom:12px;}
+
+@media(max-width:700px){
+  .row-2,.row-4{grid-template-columns:1fr;}
+  .card{padding:20px;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1><i class="fas fa-pen-to-square"></i> Admin Soal EPS-TOPIK</h1>
+  <div class="spacer"></div>
+  <a href="index.html" class="btn btn-secondary"><i class="fas fa-eye"></i> Lihat Ujian</a>
+</div>
+
+<div class="wrap">
+
+  <div class="card">
+    <h2><i class="fas fa-plus-circle"></i> <span id="formTitle">Tambah Soal Baru</span></h2>
+
+    <input type="hidden" id="editId" value="">
+
+    <div class="row-2">
+      <div class="form-group">
+        <label>Tipe Soal <span class="req">*</span></label>
+        <select id="section" onchange="onSectionChange()">
+          <option value="pilihan_gambar">Pilihan Ganda (dengan gambar)</option>
+          <option value="pilihan_teks">Pilihan Ganda (teks saja)</option>
+          <option value="isian">Isian (fill in the blank)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Tipe Jawaban</label>
+        <input type="text" value="Angka: 1 / 2 / 3 / 4 (atau teks untuk isian)" disabled style="background:#f5f7fa;color:#888;">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Soal / Pertanyaan</label>
+      <textarea id="soal" placeholder="Tulis soal di sini... (boleh dikosongkan jika soal hanya berupa gambar)"></textarea>
+    </div>
+
+    <div class="row-2">
+      <div class="form-group">
+        <label>Gambar Soal</label>
+        <div class="upload-box" onclick="document.getElementById('gambarFile').click()">
+          <i class="fas fa-image"></i>
+          <div class="txt">Klik untuk upload gambar</div>
+          <input type="file" id="gambarFile" accept="image/*" onchange="uploadFile(this,'gambar')">
+        </div>
+        <div class="preview" id="gambarPreview"></div>
+        <div id="gambarStatus"></div>
+        <input type="hidden" id="gambarUrl" value="">
+      </div>
+
+      <div class="form-group">
+        <label>Audio Soal</label>
+        <div class="upload-box" onclick="document.getElementById('audioFile').click()">
+          <i class="fas fa-volume-up"></i>
+          <div class="txt">Klik untuk upload audio</div>
+          <input type="file" id="audioFile" accept="audio/*" onchange="uploadFile(this,'audio')">
+        </div>
+        <div class="preview" id="audioPreview"></div>
+        <div id="audioStatus"></div>
+        <input type="hidden" id="audioUrl" value="">
+      </div>
+    </div>
+
+    <div id="optionsBox">
+      <div class="row-4">
+        <div class="form-group">
+          <label>① Opsi 1</label>
+          <input type="text" id="opsiA" placeholder="Pilihan 1">
+        </div>
+        <div class="form-group">
+          <label>② Opsi 2</label>
+          <input type="text" id="opsiB" placeholder="Pilihan 2">
+        </div>
+        <div class="form-group">
+          <label>③ Opsi 3</label>
+          <input type="text" id="opsiC" placeholder="Pilihan 3">
+        </div>
+        <div class="form-group">
+          <label>④ Opsi 4</label>
+          <input type="text" id="opsiD" placeholder="Pilihan 4">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Jawaban Benar <span class="req">*</span></label>
+
+      <div class="jawaban-radios" id="jawabanRadios">
+        <label data-val="1" onclick="pilihJawaban('1')">
+          <input type="radio" name="jawaban" value="1"> <span>① Angka 1</span>
+        </label>
+        <label data-val="2" onclick="pilihJawaban('2')">
+          <input type="radio" name="jawaban" value="2"> <span>② Angka 2</span>
+        </label>
+        <label data-val="3" onclick="pilihJawaban('3')">
+          <input type="radio" name="jawaban" value="3"> <span>③ Angka 3</span>
+        </label>
+        <label data-val="4" onclick="pilihJawaban('4')">
+          <input type="radio" name="jawaban" value="4"> <span>④ Angka 4</span>
+        </label>
+      </div>
+
+      <div id="jawabanIsianBox" style="display:none;">
+        <input type="text" id="jawabanIsian" placeholder="Ketik jawaban benar untuk soal isian...">
+      </div>
+
+      <div class="hint" id="jawabanHint">Untuk soal pilihan, pilih angka 1–4.</div>
+    </div>
+
+    <div class="form-group">
+      <label>Pembahasan (opsional)</label>
+      <textarea id="pembahasan" placeholder="Penjelasan jawaban..."></textarea>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="saveBtn" onclick="saveSoal()">
+        <i class="fas fa-save"></i> <span id="saveBtnText">Simpan Soal</span>
+      </button>
+      <button class="btn btn-secondary" onclick="resetForm()">
+        <i class="fas fa-undo"></i> Reset
+      </button>
+      <button class="btn btn-warning" onclick="loadData()">
+        <i class="fas fa-sync"></i> Refresh
+      </button>
+      <button class="btn btn-danger" onclick="clearAll()">
+        <i class="fas fa-trash"></i> Hapus Semua
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><i class="fas fa-list"></i> Daftar Soal (<span id="totalSoal">0</span>)</h2>
+    <div id="listBox">
+      <div class="loading-block">
+        <div class="spinner dark"></div>
+        <p style="margin-top:10px;">Memuat soal...</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ========== KONFIGURASI ==========
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzb-_z3l8au2MKiqHzJhffCKWPJL53NrBSMsg80YQ0QfQVDDioPF1ksPW6suy4YiMs/exec';
+
+const CIRCLES = { '1':'①', '2':'②', '3':'③', '4':'④' };
+
+let data = [];
+let isLoading = false;
+let currentJawaban = '';
+
+// menyimpan file yang belum diupload (menunggu klik simpan)
+let pendingFiles = {
+  gambar: null,   // { file: File, base64: string }
+  audio: null
+};
+
+// URL hasil upload (kalau sudah upload)
+let uploadedUrls = {
+  gambar: '',
+  audio: ''
+};
+
+// ========== TOAST ==========
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.className = 'toast ' + type, 3000);
+}
+
+// ========== SECTION ==========
+function onSectionChange() {
+  const s = document.getElementById('section').value;
+  const optsBox = document.getElementById('optionsBox');
+  const radiosBox = document.getElementById('jawabanRadios');
+  const isianBox = document.getElementById('jawabanIsianBox');
+  const hint = document.getElementById('jawabanHint');
+
+  if (s === 'isian') {
+    optsBox.style.display = 'none';
+    radiosBox.style.display = 'none';
+    isianBox.style.display = 'block';
+    hint.textContent = 'Untuk soal isian, ketik jawaban benar (teks).';
+  } else {
+    optsBox.style.display = 'block';
+    radiosBox.style.display = 'flex';
+    isianBox.style.display = 'none';
+    hint.textContent = 'Pilih angka 1–4 sebagai jawaban benar.';
+  }
+}
+
+// ========== PILIH JAWABAN ==========
+function pilihJawaban(val) {
+  currentJawaban = val;
+  document.querySelectorAll('#jawabanRadios label').forEach(lbl => {
+    lbl.classList.toggle('checked', lbl.dataset.val === val);
+  });
+  document.querySelectorAll('#jawabanRadios input[type=radio]').forEach(r => {
+    r.checked = (r.value === val);
+  });
+}
+
+// ========== PILIH FILE (belum upload) ==========
+function uploadFile(input, type) {
+  const file = input.files[0];
+  if (!file) return;
+
+  // Preview lokal
+  const reader = new FileReader();
+  reader.onload = e => {
+    const preview = document.getElementById(type + 'Preview');
+    if (type === 'gambar') {
+      preview.innerHTML = `<img src="${e.target.result}"><button class="rm" onclick="removeFile('${type}')">×</button>`;
+    } else {
+      preview.innerHTML = `<audio controls src="${e.target.result}"></audio><button class="rm" onclick="removeFile('${type}')">×</button>`;
+    }
+  };
+  reader.readAsDataURL(file);
+
+  // Simpan file ke pending, TIDAK upload dulu
+  pendingFiles[type] = { file: file, base64: '' };
+  uploadedUrls[type] = '';
+
+  const status = document.getElementById(type + 'Status');
+  status.innerHTML = `<span class="upload-status ok">📎 File dipilih: ${file.name} (${(file.size/1024).toFixed(1)} KB)</span>`;
+  showToast('📎 File siap. Akan diupload saat simpan.', 'success');
+}
+
+function removeFile(type) {
+  pendingFiles[type] = null;
+  uploadedUrls[type] = '';
+  document.getElementById(type + 'Url').value = '';
+  document.getElementById(type + 'Preview').innerHTML = '';
+  document.getElementById(type + 'File').value = '';
+  document.getElementById(type + 'Status').innerHTML = '';
+}
+
+// ========== UPLOAD 1 FILE (dipanggil saat simpan) ==========
+function uploadOneFile(type) {
+  return new Promise((resolve, reject) => {
+    const pf = pendingFiles[type];
+    if (!pf) {
+      resolve(uploadedUrls[type] || ''); // sudah ada URL atau kosong
+      return;
+    }
+
+    const file = pf.file;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const base64 = e.target.result.split(',')[1] || '';
+      const status = document.getElementById(type + 'Status');
+      status.innerHTML = `<span class="upload-status loading">⏳ Mengupload ${file.name}...</span>`;
+
+      fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          action: 'upload',
+          filename: file.name,
+          base64: base64
+        })
+      })
+      .then(r => r.text())
+      .then(text => {
+        let res;
+        try { res = JSON.parse(text); }
+        catch (e) { res = { success: false, msg: 'Response bukan JSON: ' + text.substring(0, 200) }; }
+
+        if (res.success && res.url) {
+          uploadedUrls[type] = res.url;
+          pendingFiles[type] = null;
+          status.innerHTML = `<span class="upload-status ok">✅ Upload sukses: ${file.name}</span>`;
+          resolve(res.url);
+        } else {
+          status.innerHTML = `<span class="upload-status err">❌ Gagal: ${res.msg || res.error || 'unknown'}</span>`;
+          reject(new Error(res.msg || res.error || 'Upload gagal'));
+        }
+      })
+      .catch(err => {
+        status.innerHTML = `<span class="upload-status err">❌ Error: ${err.message}</span>`;
+        reject(err);
+      });
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ========== LOAD ==========
+function loadData() {
+  if (isLoading) return;
+  isLoading = true;
+  document.getElementById('listBox').innerHTML = `
+    <div class="loading-block">
+      <div class="spinner dark"></div>
+      <p style="margin-top:10px;">Memuat soal...</p>
+    </div>
+  `;
+
+  fetch(APPS_SCRIPT_URL + '?t=' + Date.now())
+    .then(r => r.json())
+    .then(d => { data = Array.isArray(d) ? d : []; renderList(); })
+    .catch(err => {
+      console.error('Load error:', err);
+      data = []; renderList();
+      showToast('⚠️ Gagal memuat data', 'error');
+    })
+    .finally(() => { isLoading = false; });
+}
+
+// ========== RENDER LIST ==========
+function renderList() {
+  const box = document.getElementById('listBox');
+  document.getElementById('totalSoal').textContent = data.length;
+
+  if (data.length === 0) {
+    box.innerHTML = `<div class="empty-block"><i class="fas fa-inbox"></i><p>Belum ada soal. Tambahkan soal di atas.</p></div>`;
+    return;
+  }
+
+  let html = '<div class="q-list">';
+  data.forEach((q, i) => {
+    const tags = [];
+    if (q.gambar) tags.push('<span class="tag img"><i class="fas fa-image"></i> Gambar</span>');
+    if (q.audio)  tags.push('<span class="tag audio"><i class="fas fa-volume-up"></i> Audio</span>');
+    tags.push(`<span class="tag">${q.section === 'isian' ? 'Isian' : 'Pilihan'}</span>`);
+
+    const jawabDisplay = (q.section === 'isian')
+      ? q.jawaban
+      : (CIRCLES[q.jawaban] || q.jawaban);
+    tags.push(`<span class="tag ans">Jawaban: ${jawabDisplay}</span>`);
+
+    const thumb = q.gambar ? `<img src="${q.gambar}" class="thumb" onerror="this.style.display='none'">` : '';
+
+    html += `
+      <div class="q-item">
+        <div class="num">${i + 1}</div>
+        <div class="info">
+          <div class="txt">${q.soal || '(soal tanpa teks)'}</div>
+          <div class="meta">${tags.join('')}</div>
+        </div>
+        ${thumb}
+        <div class="btns">
+          <button class="btn btn-warning btn-sm" onclick="editSoal(${i})">
+            <i class="fas fa-pen"></i> Edit
+          </button>
+          <button class="btn btn-danger btn-sm" onclick="hapusSoal(${i})">
+            <i class="fas fa-trash"></i> Hapus
+          </button>
+        </div>
+      </div>
+    `;
+  });
+  html += '</div>';
+  box.innerHTML = html;
+}
+
+// ========== SAVE ==========
+async function saveSoal() {
+  const soal = document.getElementById('soal').value.trim();
+  const section = document.getElementById('section').value;
+  const opsiA  = document.getElementById('opsiA').value.trim();
+  const opsiB  = document.getElementById('opsiB').value.trim();
+  const opsiC  = document.getElementById('opsiC').value.trim();
+  const opsiD  = document.getElementById('opsiD').value.trim();
+  const pembahasan = document.getElementById('pembahasan').value.trim();
+
+  let jawaban = '';
+  if (section === 'isian') {
+    jawaban = document.getElementById('jawabanIsian').value.trim();
+    if (!jawaban) { showToast('⚠️ Jawaban isian wajib diisi', 'error'); return; }
+  } else {
+    if (!currentJawaban) { showToast('⚠️ Pilih jawaban benar (angka 1-4)', 'error'); return; }
+    jawaban = currentJawaban;
+    if (!opsiA || !opsiB || !opsiC || !opsiD) {
+      showToast('⚠️ Semua opsi (1-4) wajib diisi', 'error'); return;
+    }
+  }
+
+  const editId = document.getElementById('editId').value;
+
+  // Validasi minimal
+  const hasGambar = uploadedUrls.gambar || pendingFiles.gambar;
+  const hasAudio  = uploadedUrls.audio  || pendingFiles.audio;
+  if (!soal && !hasGambar && !hasAudio) {
+    showToast('⚠️ Minimal isi soal, gambar, atau audio', 'error'); return;
+  }
+
+  const btn = document.getElementById('saveBtn');
+  const original = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Proses...';
+
+  try {
+    // ---- STEP 1: Upload media (kalau ada) ----
+    let gambarUrl = uploadedUrls.gambar || '';
+    let audioUrl  = uploadedUrls.audio  || '';
+
+    if (pendingFiles.gambar) {
+      btn.innerHTML = '<span class="spinner"></span> Upload gambar...';
+      gambarUrl = await uploadOneFile('gambar');
+    }
+    if (pendingFiles.audio) {
+      btn.innerHTML = '<span class="spinner"></span> Upload audio...';
+      audioUrl = await uploadOneFile('audio');
+    }
+
+    // ---- STEP 2: Simpan data soal ----
+    btn.innerHTML = '<span class="spinner"></span> Simpan data...';
+
+    const payload = {
+      section, soal, jawaban,
+      gambar: gambarUrl,
+      audio: audioUrl,
+      opsiA, opsiB, opsiC, opsiD,
+      pembahasan
+    };
+
+    if (editId) {
+      payload.id = data[parseInt(editId)].id;
+      payload.action = 'update';
+    } else {
+      payload.action = 'add';
+    }
+
+    console.log('📤 Mengirim data soal:', {
+      action: payload.action,
+      soal: payload.soal,
+      jawaban: payload.jawaban,
+      gambar: payload.gambar ? '(ada URL)' : '(kosong)',
+      audio:  payload.audio  ? '(ada URL)' : '(kosong)'
+    });
+
+    const resp = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
+
+    const text = await resp.text();
+    console.log('📥 Response simpan:', text);
+
+    let res;
+    try { res = JSON.parse(text); }
+    catch (e) { res = { success: false, msg: 'Response bukan JSON: ' + text.substring(0, 200) }; }
+
+    if (res.success) {
+      showToast('✅ Soal ' + (editId ? 'diupdate' : 'ditambahkan'), 'success');
+      resetForm();
+      setTimeout(loadData, 1000);
+    } else {
+      showToast('❌ Gagal simpan: ' + (res.msg || res.error || 'unknown'), 'error');
+    }
+
+  } catch (err) {
+    console.error('❌ Save error:', err);
+    showToast('❌ Error: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = original;
+  }
+}
+
+// ========== EDIT ==========
+function editSoal(i) {
+  const q = data[i];
+  document.getElementById('editId').value = i;
+  document.getElementById('section').value = q.section || 'pilihan_teks';
+  document.getElementById('soal').value = q.soal || '';
+  document.getElementById('opsiA').value = q.opsiA || '';
+  document.getElementById('opsiB').value = q.opsiB || '';
+  document.getElementById('opsiC').value = q.opsiC || '';
+  document.getElementById('opsiD').value = q.opsiD || '';
+  document.getElementById('pembahasan').value = q.pembahasan || '';
+
+  // reset pending
+  pendingFiles.gambar = null;
+  pendingFiles.audio = null;
+  uploadedUrls.gambar = q.gambar || '';
+  uploadedUrls.audio  = q.audio  || '';
+
+  document.getElementById('gambarPreview').innerHTML = q.gambar
+    ? `<img src="${q.gambar}"><button class="rm" onclick="removeFile('gambar')">×</button>` : '';
+  document.getElementById('audioPreview').innerHTML = q.audio
+    ? `<audio controls src="${q.audio}"></audio><button class="rm" onclick="removeFile('audio')">×</button>` : '';
+  document.getElementById('gambarStatus').innerHTML = q.gambar ? '<span class="upload-status ok">✅ Gambar sudah ada</span>' : '';
+  document.getElementById('audioStatus').innerHTML  = q.audio  ? '<span class="upload-status ok">✅ Audio sudah ada</span>'  : '';
+
+  onSectionChange();
+  if (q.section === 'isian') {
+    document.getElementById('jawabanIsian').value = q.jawaban || '';
+    currentJawaban = q.jawaban || '';
+  } else {
+    pilihJawaban(String(q.jawaban || ''));
+  }
+
+  document.getElementById('formTitle').textContent = 'Edit Soal #' + (i + 1);
+  document.getElementById('saveBtnText').textContent = 'Update Soal';
+  window.scrollTo({top: 0, behavior: 'smooth'});
+  showToast('✏️ Mode edit aktif');
+}
+
+// ========== DELETE ==========
+function hapusSoal(i) {
+  if (!confirm('Hapus soal ini?')) return;
+  const q = data[i];
+
+  fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ action: 'delete', id: q.id })
+  })
+  .then(r => r.text())
+  .then(text => {
+    console.log('Delete response:', text);
+    showToast('🗑️ Soal dihapus', 'success');
+    setTimeout(loadData, 1000);
+  })
+  .catch(err => {
+    console.error(err);
+    showToast('❌ Gagal hapus: ' + err.message, 'error');
+  });
+}
+
+// ========== CLEAR ALL ==========
+function clearAll() {
+  if (!confirm('⚠️ Hapus SEMUA soal? Tidak bisa dibatalkan!')) return;
+
+  fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ action: 'clearAll' })
+  })
+  .then(r => r.text())
+  .then(text => {
+    console.log('ClearAll response:', text);
+    showToast('🗑️ Semua soal dihapus', 'success');
+    setTimeout(loadData, 1000);
+  })
+  .catch(err => {
+    console.error(err);
+    showToast('❌ Gagal: ' + err.message, 'error');
+  });
+}
+
+// ========== RESET ==========
+function resetForm() {
+  document.getElementById('editId').value = '';
+  document.getElementById('section').value = 'pilihan_teks';
+  document.getElementById('soal').value = '';
+  document.getElementById('opsiA').value = '';
+  document.getElementById('opsiB').value = '';
+  document.getElementById('opsiC').value = '';
+  document.getElementById('opsiD').value = '';
+  document.getElementById('pembahasan').value = '';
+  document.getElementById('gambarUrl').value = '';
+  document.getElementById('audioUrl').value  = '';
+  document.getElementById('gambarPreview').innerHTML = '';
+  document.getElementById('audioPreview').innerHTML = '';
+  document.getElementById('gambarFile').value = '';
+  document.getElementById('audioFile').value = '';
+  document.getElementById('jawabanIsian').value = '';
+  document.getElementById('gambarStatus').innerHTML = '';
+  document.getElementById('audioStatus').innerHTML = '';
+  currentJawaban = '';
+  pendingFiles.gambar = null;
+  pendingFiles.audio = null;
+  uploadedUrls.gambar = '';
+  uploadedUrls.audio = '';
+  document.querySelectorAll('#jawabanRadios label').forEach(l => l.classList.remove('checked'));
+  document.querySelectorAll('#jawabanRadios input[type=radio]').forEach(r => r.checked = false);
+
+  document.getElementById('formTitle').textContent = 'Tambah Soal Baru';
+  document.getElementById('saveBtnText').textContent = 'Simpan Soal';
+  onSectionChange();
+}
+
+// ========== INIT ==========
+onSectionChange();
+loadData();
+</script>
+</body>
+</html>
