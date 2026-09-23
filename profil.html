@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edit Profil — EPS-TOPIK</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{
+  --bg:#f5f7fa; --card-bg:#fff; --card-shadow:0 4px 16px rgba(0,0,0,.06);
+  --text:#333; --text-muted:#888; --title-color:#154a82; --link-color:#1e5fa8;
+  --border:#d0d7e2; --topbar-bg:#fff; --topbar-shadow:0 4px 16px rgba(0,0,0,.08);
+  --sub-bg:#f5f7fa; --input-bg:#fff; --input-text:#333;
+}
+[data-theme="dark"]{
+  --bg:#0a111f; --card-bg:#151d2e; --card-shadow:0 4px 16px rgba(0,0,0,.4);
+  --text:#e8eef7; --text-muted:#8b9bb4; --title-color:#5b9cff; --link-color:#5b9cff;
+  --border:#2a3448; --topbar-bg:#151d2e; --topbar-shadow:0 4px 16px rgba(0,0,0,.4);
+  --sub-bg:#0f1626; --input-bg:#0f1626; --input-text:#e8eef7;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI','Malgun Gothic',-apple-system,sans-serif;}
+body{background:var(--bg);min-height:100vh;color:var(--text);transition:background .3s,color .3s;}
+.topbar{background:var(--topbar-bg);padding:16px 24px;box-shadow:var(--topbar-shadow);display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10;}
+.topbar h1{font-size:18px;color:var(--title-color);display:flex;align-items:center;gap:10px;}
+.topbar h1 i{color:var(--link-color);}
+.topbar .spacer{flex:1;}
+.btn{padding:10px 20px;border:none;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;transition:0.2s;display:inline-flex;align-items:center;gap:8px;font-family:inherit;text-decoration:none;}
+.btn:disabled{opacity:.6;cursor:not-allowed;}
+.btn-primary{background:var(--link-color);color:#fff;}
+.btn-primary:hover:not(:disabled){filter:brightness(1.15);}
+.btn-secondary{background:var(--sub-bg);color:var(--text);border:1px solid var(--border);}
+.btn-secondary:hover{background:var(--border);}
+.btn-success{background:#2fa36b;color:#fff;}
+.btn-success:hover:not(:disabled){filter:brightness(1.1);}
+.btn-warning{background:#f0ad4e;color:#fff;}
+.btn-sm{padding:6px 12px;font-size:12px;}
+.btn-icon{background:transparent;border:1.5px solid var(--border);color:var(--text);width:38px;height:38px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:.2s;}
+.btn-icon:hover{background:var(--sub-bg);border-color:var(--link-color);color:var(--link-color);}
+.wrap{max-width:720px;margin:30px auto;padding:0 20px;}
+.card{background:var(--card-bg);border-radius:12px;padding:28px;box-shadow:var(--card-shadow);margin-bottom:20px;transition:background .3s;}
+.card h2{font-size:16px;color:var(--title-color);margin-bottom:20px;display:flex;align-items:center;gap:10px;padding-bottom:12px;border-bottom:2px solid var(--sub-bg);}
+.field{margin-bottom:16px;}
+.field label{font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;}
+.field input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;transition:.2s;background:var(--input-bg);color:var(--input-text);}
+.field input:focus{outline:none;border-color:var(--link-color);box-shadow:0 0 0 3px rgba(30,95,168,.15);}
+.field .hint{font-size:11px;color:var(--text-muted);margin-top:4px;}
+
+/* Photo upload */
+.avatar-section{display:flex;gap:24px;align-items:center;margin-bottom:20px;flex-wrap:wrap;}
+.avatar-preview{
+  width:120px;height:120px;border-radius:50%;object-fit:cover;
+  border:4px solid var(--link-color);
+  box-shadow:0 8px 24px rgba(30,95,168,.2);
+  background:var(--sub-bg);
+  display:flex;align-items:center;justify-content:center;
+  font-size:42px;color:var(--link-color);font-weight:800;
+  flex-shrink:0;
+}
+.avatar-controls{flex:1;min-width:200px;}
+.avatar-controls .btn{margin-right:8px;margin-bottom:8px;}
+.upload-hint{font-size:12px;color:var(--text-muted);margin-top:8px;line-height:1.5;}
+
+.msg{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:16px;display:none;}
+.msg.err{background:#fde8e8;color:#a33;display:block;}
+.msg.ok{background:#e8f5ee;color:#1f7f53;display:block;}
+.msg.warn{background:#fff5e0;color:#8a6a1a;display:block;}
+.spinner{display:inline-block;width:16px;height:16px;border:3px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{100%{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1><i class="fas fa-user-edit"></i> Edit Profil</h1>
+  <div class="spacer"></div>
+  <button class="btn-icon" onclick="toggleTheme()" title="Toggle dark mode"><i class="fas fa-moon" id="themeIcon"></i></button>
+  <a href="dashboard.html" class="btn btn-secondary btn-sm"><i class="fas fa-home"></i> Dashboard</a>
+</div>
+
+<div class="wrap">
+  <div class="msg" id="msg"></div>
+
+  <div class="card">
+    <h2><i class="fas fa-camera"></i> Foto Profil</h2>
+    <div class="avatar-section">
+      <div id="avatarBox" class="avatar-preview"></div>
+      <div class="avatar-controls">
+        <input type="file" id="fotoFile" accept="image/*" style="display:none;" onchange="onFilePick(this)">
+        <button class="btn btn-primary" onclick="document.getElementById('fotoFile').click()">
+          <i class="fas fa-upload"></i> Pilih Foto
+        </button>
+        <button class="btn btn-secondary" id="btnHapusFoto" onclick="hapusFoto()" style="display:none;">
+          <i class="fas fa-trash"></i> Hapus
+        </button>
+        <button class="btn btn-success" id="btnUploadFoto" onclick="uploadFoto()" style="display:none;">
+          <i class="fas fa-check"></i> Simpan Foto
+        </button>
+        <div class="upload-hint">
+          Format: JPG / PNG / WEBP. Maks 2 MB. Foto ini akan muncul di sertifikat.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><i class="fas fa-user"></i> Data Diri</h2>
+    <div class="field">
+      <label>Username (tidak bisa diubah)</label>
+      <input type="text" id="profUsername" disabled>
+    </div>
+    <div class="field">
+      <label>Nama Lengkap</label>
+      <input type="text" id="profNama" placeholder="Nama kamu">
+      <div class="hint">Nama ini akan muncul di sertifikat</div>
+    </div>
+    <button class="btn btn-primary" onclick="simpanNama()">
+      <i class="fas fa-save"></i> Simpan Nama
+    </button>
+  </div>
+
+  <div class="card">
+    <h2><i class="fas fa-lock"></i> Ganti Password</h2>
+    <div class="field">
+      <label>Password Lama</label>
+      <input type="password" id="oldPass" placeholder="••••••••">
+    </div>
+    <div class="field">
+      <label>Password Baru</label>
+      <input type="password" id="newPass" placeholder="minimal 4 karakter">
+    </div>
+    <div class="field">
+      <label>Konfirmasi Password Baru</label>
+      <input type="password" id="newPass2" placeholder="ulangi password baru">
+    </div>
+    <button class="btn btn-warning" onclick="gantiPassword()">
+      <i class="fas fa-key"></i> Ganti Password
+    </button>
+  </div>
+</div>
+
+<script>
+// ===== DARK MODE =====
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  const icon = document.getElementById('themeIcon');
+  if (icon) icon.className = t === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+}
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme') || 'light';
+  const next = cur === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('theme', next);
+  applyTheme(next);
+}
+applyTheme(localStorage.getItem('theme') || 'light');
+
+const API = 'https://script.google.com/macros/s/AKfycbw4Cr9QZTpNznxAWBed0Nt0KBsiyb2JSfKw-aADolR01SIoUcf8c370pvaKFHiaEpmb/exec';
+
+const user = JSON.parse(localStorage.getItem('user') || 'null');
+if (!user) location.href = 'login.html';
+
+let currentFoto = user.foto || '';
+let pendingFile = null;
+
+// ===== INIT =====
+function renderAvatar() {
+  const box = document.getElementById('avatarBox');
+  if (currentFoto) {
+    box.innerHTML = `<img src="${currentFoto}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+    document.getElementById('btnHapusFoto').style.display = 'inline-flex';
+  } else {
+    const init = (user.nama || user.username).charAt(0).toUpperCase();
+    box.innerHTML = init;
+    document.getElementById('btnHapusFoto').style.display = 'none';
+  }
+}
+
+document.getElementById('profUsername').value = user.username;
+document.getElementById('profNama').value = user.nama || user.username;
+renderAvatar();
+
+function showMsg(text, type) {
+  const el = document.getElementById('msg');
+  el.textContent = text;
+  el.className = 'msg ' + (type || '');
+  if (text) setTimeout(() => { el.className = 'msg'; }, 4000);
+}
+
+async function post(payload) {
+  const r = await fetch(API, { method: 'POST', headers: {'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(payload) });
+  const t = await r.text();
+  try { return JSON.parse(t); } catch(e) { return { success:false, msg:'Response tidak valid' }; }
+}
+
+// ===== FOTO =====
+function onFilePick(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) {
+    showMsg('❌ Ukuran foto maksimal 2 MB', 'err');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    const box = document.getElementById('avatarBox');
+    box.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+    pendingFile = file;
+    document.getElementById('btnUploadFoto').style.display = 'inline-flex';
+    showMsg('📎 Foto siap. Klik "Simpan Foto" untuk mengupload.', 'ok');
+  };
+  reader.readAsDataURL(file);
+}
+
+async function uploadFoto() {
+  if (!pendingFile) return;
+  const btn = document.getElementById('btnUploadFoto');
+  const original = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Upload...';
+
+  try {
+    // 1. Upload ke Drive
+    const base64 = await fileToBase64(pendingFile);
+    const upRes = await post({
+      action: 'upload',
+      username: user.username,
+      filename: 'profile_' + user.username + '_' + Date.now() + '_' + pendingFile.name,
+      base64: base64
+    });
+
+    if (!upRes.success || !upRes.url) {
+      throw new Error(upRes.msg || 'Upload gagal');
+    }
+
+    // 2. Update profile
+    const profRes = await post({
+      action: 'updateProfile',
+      username: user.username,
+      nama: user.nama,
+      foto: upRes.url
+    });
+
+    if (!profRes.success) throw new Error(profRes.msg || 'Update profil gagal');
+
+    // 3. Update localStorage
+    user.foto = upRes.url;
+    localStorage.setItem('user', JSON.stringify(user));
+    currentFoto = upRes.url;
+    pendingFile = null;
+    document.getElementById('btnUploadFoto').style.display = 'none';
+    renderAvatar();
+    showMsg('✅ Foto profil berhasil disimpan!', 'ok');
+  } catch(err) {
+    showMsg('❌ ' + err.message, 'err');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = original;
+  }
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result.split(',')[1] || '');
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function hapusFoto() {
+  if (!confirm('Hapus foto profil?')) return;
+  try {
+    const res = await post({
+      action: 'updateProfile',
+      username: user.username,
+      nama: user.nama,
+      foto: 'HAPUS'
+    });
+    if (res.success) {
+      user.foto = '';
+      localStorage.setItem('user', JSON.stringify(user));
+      currentFoto = '';
+      renderAvatar();
+      showMsg('✅ Foto profil dihapus', 'ok');
+    } else {
+      showMsg('❌ ' + (res.msg || 'Gagal hapus'), 'err');
+    }
+  } catch(err) {
+    showMsg('❌ ' + err.message, 'err');
+  }
+}
+
+// ===== NAMA =====
+async function simpanNama() {
+  const newNama = document.getElementById('profNama').value.trim();
+  if (!newNama) { showMsg('❌ Nama tidak boleh kosong', 'err'); return; }
+  try {
+    const res = await post({
+      action: 'updateProfile',
+      username: user.username,
+      nama: newNama
+    });
+    if (res.success) {
+      user.nama = newNama;
+      localStorage.setItem('user', JSON.stringify(user));
+      renderAvatar();
+      showMsg('✅ Nama berhasil diupdate', 'ok');
+    } else {
+      showMsg('❌ ' + (res.msg || 'Gagal simpan'), 'err');
+    }
+  } catch(err) {
+    showMsg('❌ ' + err.message, 'err');
+  }
+}
+
+// ===== PASSWORD =====
+async function gantiPassword() {
+  const oldPass = document.getElementById('oldPass').value;
+  const newPass = document.getElementById('newPass').value;
+  const newPass2 = document.getElementById('newPass2').value;
+
+  if (!oldPass || !newPass || !newPass2) { showMsg('❌ Isi semua field', 'err'); return; }
+  if (newPass.length < 4) { showMsg('❌ Password baru minimal 4 karakter', 'err'); return; }
+  if (newPass !== newPass2) { showMsg('❌ Konfirmasi password tidak sama', 'err'); return; }
+
+  try {
+    const res = await post({
+      action: 'changePassword',
+      username: user.username,
+      oldPassword: oldPass,
+      newPassword: newPass
+    });
+    if (res.success) {
+      document.getElementById('oldPass').value = '';
+      document.getElementById('newPass').value = '';
+      document.getElementById('newPass2').value = '';
+      showMsg('✅ Password berhasil diganti', 'ok');
+    } else {
+      showMsg('❌ ' + (res.msg || 'Gagal ganti password'), 'err');
+    }
+  } catch(err) {
+    showMsg('❌ ' + err.message, 'err');
+  }
+}
+</script>
+</body>
+</html>
