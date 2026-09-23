@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notifikasi — EPS-TOPIK</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{
+  --bg:#f5f7fa; --card-bg:#fff; --card-shadow:0 4px 16px rgba(0,0,0,.06);
+  --text:#333; --text-muted:#888; --title-color:#154a82; --link-color:#1e5fa8;
+  --border:#d0d7e2; --topbar-bg:#fff; --topbar-shadow:0 4px 16px rgba(0,0,0,.08);
+  --sub-bg:#f5f7fa;
+}
+[data-theme="dark"]{
+  --bg:#0a111f; --card-bg:#151d2e; --card-shadow:0 4px 16px rgba(0,0,0,.4);
+  --text:#e8eef7; --text-muted:#8b9bb4; --title-color:#5b9cff; --link-color:#5b9cff;
+  --border:#2a3448; --topbar-bg:#151d2e; --topbar-shadow:0 4px 16px rgba(0,0,0,.4);
+  --sub-bg:#0f1626;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI','Malgun Gothic',-apple-system,sans-serif;}
+body{background:var(--bg);min-height:100vh;color:var(--text);transition:background .3s,color .3s;}
+.topbar{background:var(--topbar-bg);padding:16px 24px;box-shadow:var(--topbar-shadow);display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10;flex-wrap:wrap;}
+.topbar h1{font-size:18px;color:var(--title-color);display:flex;align-items:center;gap:10px;}
+.topbar h1 i{color:var(--link-color);}
+.topbar .spacer{flex:1;}
+.topbar .user{font-size:13px;color:var(--text-muted);}
+.topbar .user strong{color:var(--link-color);}
+.btn{padding:10px 20px;border:none;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;transition:0.2s;display:inline-flex;align-items:center;gap:8px;font-family:inherit;text-decoration:none;}
+.btn-primary{background:var(--link-color);color:#fff;}
+.btn-primary:hover{filter:brightness(1.15);}
+.btn-secondary{background:var(--sub-bg);color:var(--text);border:1px solid var(--border);}
+.btn-secondary:hover{background:var(--border);}
+.btn-sm{padding:6px 12px;font-size:12px;}
+.btn-xs{padding:4px 10px;font-size:11px;}
+.btn-icon{background:transparent;border:1.5px solid var(--border);color:var(--text);width:38px;height:38px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:.2s;position:relative;}
+.btn-icon:hover{background:var(--sub-bg);border-color:var(--link-color);color:var(--link-color);}
+.wrap{max-width:900px;margin:30px auto;padding:0 20px;}
+.title{font-size:24px;color:var(--text);margin-bottom:6px;}
+.title strong{color:var(--link-color);}
+.sub{color:var(--text-muted);font-size:14px;margin-bottom:20px;}
+
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;align-items:center;}
+.toolbar .filter-tab{padding:8px 16px;background:var(--card-bg);color:var(--text-muted);border:1.5px solid var(--border);border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:.2s;}
+.toolbar .filter-tab:hover{border-color:var(--link-color);color:var(--link-color);}
+.toolbar .filter-tab.active{background:var(--link-color);color:#fff;border-color:var(--link-color);}
+.toolbar .spacer{flex:1;}
+
+.notif-item{
+  background:var(--card-bg);border-radius:12px;padding:18px;margin-bottom:10px;
+  box-shadow:var(--card-shadow);display:flex;gap:16px;align-items:flex-start;
+  border-left:4px solid transparent;transition:.2s;position:relative;
+}
+.notif-item:hover{transform:translateX(2px);}
+.notif-item.unread{border-left-color:var(--link-color);background:linear-gradient(90deg,rgba(30,95,168,.04) 0%,var(--card-bg) 8%);}
+.notif-item.tipe-bantuan{border-left-color:#f0ad4e;}
+.notif-item.tipe-balasan{border-left-color:#2fa36b;}
+.notif-item.tipe-kuota{border-left-color:#7c4dff;}
+.notif-item.tipe-sistem{border-left-color:#1e5fa8;}
+.notif-item.tipe-request{border-left-color:#d9534f;}
+.notif-item .icon-box{
+  width:44px;height:44px;border-radius:12px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;color:#fff;
+}
+.notif-item.tipe-bantuan .icon-box{background:linear-gradient(135deg,#f0ad4e,#ec971f);}
+.notif-item.tipe-balasan .icon-box{background:linear-gradient(135deg,#2fa36b,#1f7f53);}
+.notif-item.tipe-kuota .icon-box{background:linear-gradient(135deg,#7c4dff,#5e35b1);}
+.notif-item.tipe-sistem .icon-box{background:linear-gradient(135deg,#1e5fa8,#154a82);}
+.notif-item.tipe-request .icon-box{background:linear-gradient(135deg,#d9534f,#c9302c);}
+.notif-item .content{flex:1;min-width:0;}
+.notif-item .content h3{font-size:15px;color:var(--text);margin-bottom:4px;font-weight:700;}
+.notif-item .content p{font-size:13px;color:var(--text-muted);line-height:1.5;margin-bottom:8px;}
+.notif-item .content .meta{font-size:11px;color:var(--text-muted);display:flex;gap:12px;flex-wrap:wrap;}
+.notif-item .content .meta span{display:flex;align-items:center;gap:4px;}
+.notif-item .actions{display:flex;flex-direction:column;gap:6px;flex-shrink:0;}
+.notif-item .unread-dot{
+  position:absolute;top:12px;right:12px;
+  width:10px;height:10px;background:var(--link-color);border-radius:50%;
+  box-shadow:0 0 0 3px rgba(30,95,168,.2);
+  animation:pulse-dot 2s infinite;
+}
+@keyframes pulse-dot{0%,100%{box-shadow:0 0 0 3px rgba(30,95,168,.2);}50%{box-shadow:0 0 0 6px rgba(30,95,168,.05);}}
+
+.empty{text-align:center;padding:60px 20px;color:var(--text-muted);}
+.empty i{font-size:56px;opacity:.3;display:block;margin-bottom:16px;}
+.empty h3{color:var(--text);margin-bottom:8px;}
+.empty p{font-size:13px;margin-bottom:20px;}
+
+@media(max-width:600px){
+  .topbar .user{display:none;}
+  .notif-item{flex-direction:column;gap:10px;}
+  .notif-item .actions{flex-direction:row;width:100%;}
+  .notif-item .actions .btn{flex:1;justify-content:center;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1><i class="fas fa-bell"></i> Notifikasi</h1>
+  <div class="spacer"></div>
+  <span class="user">👤 <strong id="userName">-</strong></span>
+  <button class="btn-icon" onclick="toggleTheme()" title="Toggle dark mode"><i class="fas fa-moon" id="themeIcon"></i></button>
+  <a href="dashboard.html" class="btn btn-secondary btn-sm"><i class="fas fa-home"></i> Dashboard</a>
+</div>
+
+<div class="wrap">
+  <div class="title">Notifikasi Kamu 🔔</div>
+  <p class="sub">Semua info & aktivitas akun kamu</p>
+
+  <div class="toolbar">
+    <button class="filter-tab active" data-filter="all" onclick="setFilter('all')">Semua</button>
+    <button class="filter-tab" data-filter="unread" onclick="setFilter('unread')">Belum Dibaca</button>
+    <div class="spacer"></div>
+    <button class="btn btn-secondary btn-sm" onclick="markAllRead()"><i class="fas fa-check-double"></i> Tandai Semua Dibaca</button>
+  </div>
+
+  <div id="listBox">
+    <div style="text-align:center;padding:80px 20px;color:var(--text-muted);">
+      <div style="display:inline-block;width:40px;height:40px;border:4px solid var(--sub-bg);border-top-color:var(--link-color);border-radius:50%;animation:spin .8s linear infinite;"></div>
+      <p style="margin-top:14px;">Memuat notifikasi...</p>
+    </div>
+  </div>
+</div>
+
+<style>@keyframes spin{100%{transform:rotate(360deg)}}</style>
+
+<script>
+// ===== DARK MODE =====
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  const icon = document.getElementById('themeIcon');
+  if (icon) icon.className = t === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+}
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme') || 'light';
+  const next = cur === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('theme', next);
+  applyTheme(next);
+}
+applyTheme(localStorage.getItem('theme') || 'light');
+
+// ⚠️ GANTI URL INI
+const API = 'https://script.google.com/macros/s/AKfycbw4Cr9QZTpNznxAWBed0Nt0KBsiyb2JSfKw-aADolR01SIoUcf8c370pvaKFHiaEpmb/exec';
+
+let user = JSON.parse(localStorage.getItem('user') || 'null');
+if (!user) location.href = 'login.html';
+document.getElementById('userName').textContent = user.nama || user.username;
+
+let allNotifs = [];
+let currentFilter = 'all';
+
+// ===== LOAD =====
+function loadNotifs() {
+  fetch(API + '?action=getNotifications&username=' + encodeURIComponent(user.username) + '&t=' + Date.now())
+    .then(r => r.json())
+    .then(res => {
+      if (res.success) {
+        allNotifs = res.notifications || [];
+        renderList();
+      } else {
+        document.getElementById('listBox').innerHTML = `<div class="empty"><i class="fas fa-exclamation-triangle"></i><p>${res.msg || 'Gagal memuat'}</p></div>`;
+      }
+    })
+    .catch(() => {
+      document.getElementById('listBox').innerHTML = `
+        <div class="empty">
+          <i class="fas fa-exclamation-triangle"></i>
+          <h3>Gagal Memuat Notifikasi</h3>
+          <p>Periksa koneksi internet Anda</p>
+          <button class="btn btn-primary" onclick="loadNotifs()"><i class="fas fa-redo"></i> Coba Lagi</button>
+        </div>`;
+    });
+}
+
+function setFilter(f) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.toggle('active', t.dataset.filter === f));
+  renderList();
+}
+
+// ===== RENDER =====
+function renderList() {
+  const box = document.getElementById('listBox');
+  let filtered = allNotifs;
+  if (currentFilter === 'unread') filtered = allNotifs.filter(n => !n.isRead);
+
+  if (filtered.length === 0) {
+    box.innerHTML = `
+      <div class="empty">
+        <i class="fas fa-bell-slash"></i>
+        <h3>${currentFilter === 'unread' ? 'Ngga ada yang belum dibaca' : 'Belum ada notifikasi'}</h3>
+        <p>${currentFilter === 'unread' ? 'Semua notif udah dibaca 👍' : 'Notifikasi bakal muncul di sini kalau ada aktivitas'}</p>
+      </div>`;
+    return;
+  }
+
+  const icons = {
+    'bantuan': 'fa-question-circle',
+    'balasan': 'fa-comment-dots',
+    'kuota': 'fa-ticket-alt',
+    'sistem': 'fa-info-circle',
+    'request': 'fa-paper-plane',
+    'info': 'fa-bell'
+  };
+
+  let html = '';
+  filtered.forEach(n => {
+    const iconClass = icons[n.tipe] || 'fa-bell';
+    html += `
+      <div class="notif-item tipe-${n.tipe} ${!n.isRead ? 'unread' : ''}" onclick="onNotifClick(${n.id}, ${n.isRead}, '${(n.linkUrl || '').replace(/'/g, "\\'")}')">
+        ${!n.isRead ? '<div class="unread-dot"></div>' : ''}
+        <div class="icon-box"><i class="fas ${iconClass}"></i></div>
+        <div class="content">
+          <h3>${n.judul}</h3>
+          <p>${n.pesan}</p>
+          <div class="meta">
+            <span><i class="fas fa-clock"></i> ${n.tanggal}</span>
+            <span><i class="fas fa-user"></i> ${n.from === 'system' ? 'Sistem' : '@' + n.from}</span>
+          </div>
+        </div>
+        <div class="actions">
+          ${!n.isRead ? `<button class="btn btn-primary btn-xs" onclick="event.stopPropagation();markRead(${n.id})"><i class="fas fa-check"></i> Baca</button>` : ''}
+          <button class="btn btn-danger btn-xs" onclick="event.stopPropagation();deleteNotif(${n.id})"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>`;
+  });
+  box.innerHTML = html;
+}
+
+// ===== ACTIONS =====
+function onNotifClick(notifId, isRead, linkUrl) {
+  // Mark as read dulu
+  if (!isRead) markRead(notifId, true);
+  // Kalau ada link, redirect
+  if (linkUrl) {
+    setTimeout(() => location.href = linkUrl, 200);
+  }
+}
+
+async function markRead(notifId, silent) {
+  try {
+    await fetch(API, {
+      method: 'POST', headers: {'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify({ action: 'markNotifRead', username: user.username, notifId })
+    });
+    const idx = allNotifs.findIndex(n => n.id === notifId);
+    if (idx >= 0) allNotifs[idx].isRead = true;
+    if (!silent) renderList();
+    if (window.parent && window.parent.updateNotifBadge) window.parent.updateNotifBadge();
+  } catch(e) {}
+}
+
+async function markAllRead() {
+  if (allNotifs.filter(n => !n.isRead).length === 0) {
+    alert('Semua notif udah dibaca 👍');
+    return;
+  }
+  try {
+    await fetch(API, {
+      method: 'POST', headers: {'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify({ action: 'markAllNotifRead', username: user.username })
+    });
+    allNotifs.forEach(n => n.isRead = true);
+    renderList();
+    if (window.parent && window.parent.updateNotifBadge) window.parent.updateNotifBadge();
+  } catch(e) { alert('Gagal: ' + e.message); }
+}
+
+async function deleteNotif(notifId) {
+  if (!confirm('Hapus notifikasi ini?')) return;
+  try {
+    await fetch(API, {
+      method: 'POST', headers: {'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify({ action: 'deleteNotif', username: user.username, notifId })
+    });
+    allNotifs = allNotifs.filter(n => n.id !== notifId);
+    renderList();
+    if (window.parent && window.parent.updateNotifBadge) window.parent.updateNotifBadge();
+  } catch(e) { alert('Gagal: ' + e.message); }
+}
+
+// INIT
+loadNotifs();
+</script>
+</body>
+</html>
