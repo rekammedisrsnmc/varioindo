@@ -1,634 +1,189 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="id">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>EPS-TOPIK 쓰기 | Ujian Bahasa Korea</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — EPS-TOPIK</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 :root{
-  --blue:#1e5fa8;
-  --blue-dark:#154a82;
-  --blue-light:#e8f0fa;
-  --bg:#f5f7fa;
-  --border:#d0d7e2;
-  --text:#1a1a1a;
-  --shadow:0 4px 16px rgba(0,0,0,.08);
-  --red:#d9534f;
-  --green:#2fa36b;
-  --yellow:#f0ad4e;
+  --bg-grad-1:#1e5fa8; --bg-grad-2:#154a82;
+  --card-bg:#fff; --card-text:#333;
+  --input-bg:#fff; --input-border:#d0d7e2; --input-text:#333;
+  --tab-bg:#f0f3f7; --tab-text:#666; --tab-active-bg:#fff; --tab-active-text:#1e5fa8;
+  --muted:#888; --title-color:#154a82;
+}
+[data-theme="dark"]{
+  --bg-grad-1:#0a1428; --bg-grad-2:#050b18;
+  --card-bg:#1a2233; --card-text:#e8eef7;
+  --input-bg:#131b2c; --input-border:#2a3448; --input-text:#e8eef7;
+  --tab-bg:#131b2c; --tab-text:#8b9bb4; --tab-active-bg:#25324a; --tab-active-text:#5b9cff;
+  --muted:#8b9bb4; --title-color:#5b9cff;
 }
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI','Malgun Gothic',-apple-system,sans-serif;}
-body{background:var(--bg);min-height:100vh;color:var(--text);}
-
-.exam-paper{
-  max-width:800px;
-  margin:30px auto;
-  background:#fff;
-  box-shadow:0 8px 30px rgba(0,0,0,.12);
-  border-radius:4px;
-  padding:50px 60px;
-}
-.exam-title{
-  text-align:center;
-  font-size:15px;
-  color:#333;
-  margin-bottom:8px;
-  letter-spacing:0.5px;
-}
-.exam-heading{
-  text-align:center;
-  font-size:22px;
-  font-weight:700;
-  padding:12px 0;
-  border-top:2px solid #333;
-  border-bottom:2px solid #333;
-  margin:15px 0 30px 0;
-  letter-spacing:3px;
-}
-.question{margin-bottom:32px;}
-.question-num{font-size:15px;font-weight:700;color:#333;margin-bottom:12px;}
-.question-num::after{content:'.';}
-
-.question-body{
-  display:flex;
-  gap:24px;
-  align-items:flex-start;
-  padding-left:20px;
-}
-.question-media{
-  flex-shrink:0;
-  width:220px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:8px;
-}
-.question-media img{
-  max-width:100%;
-  max-height:180px;
-  border-radius:4px;
-  object-fit:contain;
-}
-.question-text{
-  font-size:15px;
-  line-height:1.8;
-  color:#222;
-  margin-bottom:10px;
-}
-.question-content{flex:1;min-width:0;}
-.question-media audio{width:100%;margin-top:8px;}
-
-.options{
-  list-style:none;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px 20px;
-  margin-top:12px;
-}
-.options.vertical{grid-template-columns:1fr;}
-.options li{
-  font-size:15px;
-  line-height:1.6;
-  color:#333;
-  padding:6px 10px;
-  border-radius:6px;
-  cursor:pointer;
-  transition:0.15s;
-  display:flex;
-  align-items:center;
-  gap:8px;
-  border:2px solid transparent;
-  user-select:none;
-}
-.options li:hover{background:var(--blue-light);}
-.options li.selected{
-  background:var(--blue-light);
-  border-color:var(--blue);
-  font-weight:600;
-}
-.options li .circle{
-  font-size:15px;
-  color:#333;
-  flex-shrink:0;
-}
-.options li.selected .circle{color:var(--blue);}
-
-.fill-input{
-  width:100%;
-  padding:10px 14px;
-  border:2px solid var(--border);
-  border-radius:6px;
-  font-size:15px;
-  margin-top:10px;
-  font-family:inherit;
-}
-.fill-input:focus{outline:none;border-color:var(--blue);}
-
-.nav-bar{
-  max-width:800px;
-  margin:0 auto 30px;
-  padding:0 60px;
-  display:flex;
-  gap:12px;
-  justify-content:space-between;
-  flex-wrap:wrap;
-}
-.btn{
-  padding:11px 24px;
-  border:none;
-  border-radius:6px;
-  font-weight:600;
-  font-size:14px;
-  cursor:pointer;
-  transition:0.2s;
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  font-family:inherit;
-}
-.btn:disabled{opacity:0.4;cursor:not-allowed;}
-.btn-primary{background:var(--blue);color:#fff;}
-.btn-primary:hover:not(:disabled){background:var(--blue-dark);}
-.btn-secondary{background:#e4e8ee;color:#333;}
-.btn-secondary:hover:not(:disabled){background:#d0d7e2;}
-.btn-success{background:var(--green);color:#fff;}
-.btn-success:hover{background:#1f7f53;}
-.btn-danger{background:var(--red);color:#fff;}
-
-.exam-info{
-  max-width:800px;
-  margin:20px auto 0;
-  padding:16px 24px;
-  background:#fff;
-  border-radius:8px;
-  box-shadow:var(--shadow);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:16px;
-  flex-wrap:wrap;
-}
-.exam-info .item{font-size:14px;color:#555;}
-.exam-info .item strong{color:var(--blue-dark);font-size:16px;}
-.timer{
-  background:var(--blue);
-  color:#fff;
-  padding:8px 18px;
-  border-radius:30px;
-  font-weight:700;
-  font-size:16px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-.timer.warning{background:var(--yellow);}
-.timer.danger{background:var(--red);animation:pulse 1s infinite;}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.75}}
-
-.progress-wrap{
-  max-width:800px;
-  margin:12px auto 0;
-  height:6px;
-  background:#e4e8ee;
-  border-radius:6px;
-  overflow:hidden;
-}
-.progress-fill{
-  height:100%;
-  background:var(--blue);
-  width:0%;
-  transition:width 0.3s;
-}
-
-.spinner-container{text-align:center;padding:100px 20px;}
-.spinner{
-  display:inline-block;
-  width:44px;height:44px;
-  border:4px solid #e4e8ee;
-  border-top-color:var(--blue);
-  border-radius:50%;
-  animation:spin 0.8s linear infinite;
-}
+body{background:linear-gradient(135deg,var(--bg-grad-1),var(--bg-grad-2));min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;transition:background .3s;}
+.theme-toggle{position:fixed;top:20px;right:20px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;width:44px;height:44px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:.2s;}
+.theme-toggle:hover{background:rgba(255,255,255,.25);transform:scale(1.05);}
+.box{background:var(--card-bg);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.3);padding:40px;width:100%;max-width:420px;animation:fadeUp .4s ease;transition:background .3s;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.box .logo{text-align:center;font-size:42px;margin-bottom:8px;}
+.box h1{text-align:center;color:var(--title-color);margin-bottom:6px;font-size:22px;letter-spacing:1px;}
+.box .sub{text-align:center;color:var(--muted);font-size:13px;margin-bottom:26px;}
+.tab{display:flex;background:var(--tab-bg);border-radius:10px;padding:4px;margin-bottom:22px;}
+.tab button{flex:1;padding:11px;border:none;background:transparent;border-radius:8px;font-weight:600;cursor:pointer;color:var(--tab-text);font-size:14px;transition:.2s;font-family:inherit;}
+.tab button.active{background:var(--tab-active-bg);color:var(--tab-active-text);box-shadow:0 2px 8px rgba(0,0,0,.08);}
+.field{margin-bottom:14px;}
+.field label{font-size:13px;font-weight:600;color:var(--card-text);display:block;margin-bottom:6px;}
+.field input{width:100%;padding:12px 14px;border:1.5px solid var(--input-border);border-radius:8px;font-size:14px;font-family:inherit;transition:.2s;background:var(--input-bg);color:var(--input-text);}
+.field input:focus{outline:none;border-color:var(--bg-grad-1);box-shadow:0 0 0 3px rgba(30,95,168,.15);}
+.field .hint{font-size:11px;color:var(--muted);margin-top:4px;}
+.btn{width:100%;padding:13px;border:none;border-radius:8px;background:var(--bg-grad-1);color:#fff;font-weight:700;font-size:15px;cursor:pointer;margin-top:8px;font-family:inherit;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn:hover:not(:disabled){filter:brightness(1.15);}
+.btn:disabled{opacity:.6;cursor:not-allowed;}
+.msg{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:16px;display:none;}
+.msg.err{background:#fde8e8;color:#a33;display:block;}
+.msg.ok{background:#e8f5ee;color:#1f7f53;display:block;}
+.msg.warn{background:#fff5e0;color:#8a6a1a;display:block;}
+.spinner{display:inline-block;width:16px;height:16px;border:3px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
 @keyframes spin{100%{transform:rotate(360deg)}}
-.spinner-container p{margin-top:14px;color:#888;}
-
-.result-wrap{
-  max-width:800px;
-  margin:30px auto;
-  padding:40px;
-  background:#fff;
-  border-radius:12px;
-  box-shadow:var(--shadow);
-  text-align:center;
-}
-.result-wrap h1{color:var(--blue-dark);margin-bottom:8px;}
-.result-wrap .sub{color:#888;margin-bottom:24px;}
-.score-big{
-  width:160px;height:160px;
-  border-radius:50%;
-  background:var(--blue);
-  color:#fff;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  margin:0 auto 24px;
-  box-shadow:0 8px 30px rgba(30,95,168,0.35);
-}
-.score-big .num{font-size:52px;font-weight:800;line-height:1;}
-.score-big .lbl{font-size:13px;opacity:0.9;margin-top:4px;letter-spacing:2px;}
-.stat-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:14px;
-  margin:24px 0;
-}
-.stat{padding:18px;background:#f5f7fa;border-radius:10px;}
-.stat .n{font-size:26px;font-weight:800;}
-.stat .l{font-size:12px;color:#888;margin-top:4px;}
-.stat.green .n{color:var(--green);}
-.stat.red .n{color:var(--red);}
-.stat.gray .n{color:#888;}
-
-.review-item{
-  text-align:left;
-  background:#fff;
-  border:1.5px solid var(--border);
-  border-radius:10px;
-  padding:18px;
-  margin-bottom:12px;
-}
-.review-item.correct{border-left:5px solid var(--green);}
-.review-item.wrong{border-left:5px solid var(--red);}
-.review-item .rhead{
-  display:flex;justify-content:space-between;
-  font-size:13px;font-weight:700;margin-bottom:8px;
-}
-.review-item .rhead .ok{color:var(--green);}
-.review-item .rhead .no{color:var(--red);}
-.review-item .rq{font-size:14px;margin-bottom:10px;color:#333;}
-.review-item .ra{font-size:13px;color:#555;background:#f5f7fa;padding:8px 12px;border-radius:6px;}
-
-footer{
-  text-align:center;
-  padding:24px 20px;
-  color:#999;
-  font-size:13px;
-}
-@keyframes fadeUp{from{opacity:0;transform:translateY(15px)}to{opacity:1}}
-.fade{animation:fadeUp .4s ease;}
-@media(max-width:700px){
-  .exam-paper{padding:30px 20px;margin:15px;}
-  .nav-bar{padding:0 20px;}
-  .question-body{flex-direction:column;padding-left:10px;}
-  .question-media{width:100%;}
-  .options{grid-template-columns:1fr;}
-  .stat-grid{grid-template-columns:1fr;}
-}
+.footer-txt{text-align:center;font-size:12px;color:var(--muted);margin-top:20px;}
 </style>
 </head>
 <body>
+<button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode"><i class="fas fa-moon" id="themeIcon"></i></button>
 
-<div class="exam-info" id="examInfo" style="display:none;">
-  <div class="item">📝 Soal <strong id="curNum">1</strong> / <strong id="totNum">-</strong></div>
-  <div class="item">✅ Terjawab: <strong id="answeredNum">0</strong></div>
-  <div class="timer" id="timerBox">
-    <i class="fas fa-clock"></i> <span id="timerText">--:--</span>
+<div class="box">
+  <div class="logo">🇰🇷</div>
+  <h1>EPS-TOPIK</h1>
+  <p class="sub">Masuk untuk mulai latihan bahasa Korea</p>
+
+  <div class="tab">
+    <button id="tabLogin" class="active" onclick="switchTab('login')">Masuk</button>
+    <button id="tabReg" onclick="switchTab('reg')">Daftar</button>
   </div>
-</div>
-<div class="progress-wrap" id="progressWrap" style="display:none;">
-  <div class="progress-fill" id="progressFill"></div>
-</div>
 
-<div id="app">
-  <div class="spinner-container">
-    <div class="spinner"></div>
-    <p>Memuat soal ujian...</p>
-  </div>
-</div>
+  <div class="msg" id="msg"></div>
 
-<footer>
-  한국어능력시험 (EPS-TOPIK) — 쓰기 (20 문항)
-</footer>
+  <form id="formLogin" onsubmit="doLogin(event)">
+    <div class="field">
+      <label>Username</label>
+      <input type="text" id="loginUser" required autocomplete="username" placeholder="username kamu">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="loginPass" required autocomplete="current-password" placeholder="••••••••">
+    </div>
+    <button class="btn" id="btnLogin" type="submit"><i class="fas fa-sign-in-alt"></i> Masuk</button>
+    <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:14px;">
+      Lupa password? Hubungi admin untuk reset.
+    </p>
+  </form>
+
+  <form id="formReg" onsubmit="doRegister(event)" style="display:none;">
+    <div class="field">
+      <label>Nama Lengkap</label>
+      <input type="text" id="regNama" required placeholder="Nama kamu">
+    </div>
+    <div class="field">
+      <label>Username</label>
+      <input type="text" id="regUser" required minlength="3" placeholder="minimal 3 karakter">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="regPass" required minlength="4" placeholder="minimal 4 karakter">
+    </div>
+    <button class="btn" id="btnReg" type="submit"><i class="fas fa-user-plus"></i> Daftar</button>
+  </form>
+
+  <p class="footer-txt">© EPS-TOPIK Practice</p>
+</div>
 
 <script>
-// ========== KONFIGURASI ==========
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzb-_z3l8au2MKiqHzJhffCKWPJL53NrBSMsg80YQ0QfQVDDioPF1ksPW6suy4YiMs/exec';
-
-// ========== STATE ==========
-let questions = [];
-let currentIndex = 0;
-let answers = {};
-let startTime = null;
-let timerInterval = null;
-let examDuration = 20 * 60;
-let isFinished = false;
-
-const CIRCLES = { '1':'①', '2':'②', '3':'③', '4':'④' };
-
-// ========== LOAD ==========
-function loadQuestions() {
-  const app = document.getElementById('app');
-  app.innerHTML = `
-    <div class="spinner-container">
-      <div class="spinner"></div>
-      <p>Memuat soal ujian...</p>
-    </div>
-  `;
-
-  fetch(APPS_SCRIPT_URL + '?t=' + Date.now())
-    .then(res => {
-      if (!res.ok) throw new Error('Network error');
-      return res.json();
-    })
-    .then(data => {
-      if (data && data.length > 0) {
-        questions = data;
-        startExam();
-      } else {
-        app.innerHTML = `
-          <div class="result-wrap">
-            <h1>📭 Belum Ada Soal</h1>
-            <p class="sub">Silakan tambahkan soal melalui Admin Panel</p>
-            <a href="admin.html" class="btn btn-primary" style="text-decoration:none;">
-              <i class="fas fa-user-cog"></i> Buka Admin Panel
-            </a>
-          </div>
-        `;
-      }
-    })
-    .catch(() => {
-      app.innerHTML = `
-        <div class="result-wrap">
-          <h1>⚠️ Gagal Memuat Soal</h1>
-          <p class="sub">Periksa koneksi internet Anda</p>
-          <button class="btn btn-primary" onclick="loadQuestions()">
-            <i class="fas fa-redo"></i> Coba Lagi
-          </button>
-        </div>
-      `;
-    });
+// ===== DARK MODE =====
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  const icon = document.getElementById('themeIcon');
+  if (icon) icon.className = t === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
 }
-
-// ========== START ==========
-function startExam() {
-  currentIndex = 0;
-  answers = {};
-  isFinished = false;
-  startTime = Date.now();
-  examDuration = Math.max(questions.length * 60, 300);
-
-  document.getElementById('examInfo').style.display = 'flex';
-  document.getElementById('progressWrap').style.display = 'block';
-  document.getElementById('totNum').textContent = questions.length;
-
-  if (timerInterval) clearInterval(timerInterval);
-  timerInterval = setInterval(updateTimer, 1000);
-
-  renderQuestion();
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme') || 'light';
+  const next = cur === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('theme', next);
+  applyTheme(next);
 }
+applyTheme(localStorage.getItem('theme') || 'light');
 
-// ========== TIMER ==========
-function updateTimer() {
-  if (isFinished) return;
-  const elapsed = Math.floor((Date.now() - startTime) / 1000);
-  const remaining = examDuration - elapsed;
+// ⚠️ GANTI dengan URL Apps Script lu
+const API = 'https://script.google.com/macros/s/AKfycbw4Cr9QZTpNznxAWBed0Nt0KBsiyb2JSfKw-aADolR01SIoUcf8c370pvaKFHiaEpmb/exec';
 
-  const box = document.getElementById('timerBox');
-  const text = document.getElementById('timerText');
+if (localStorage.getItem('user')) location.href = 'dashboard.html';
 
-  if (remaining <= 0) {
-    clearInterval(timerInterval);
-    finishExam(true);
-    return;
-  }
-
-  const m = Math.floor(remaining / 60);
-  const s = remaining % 60;
-  text.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-
-  box.classList.remove('warning','danger');
-  if (remaining <= 60) box.classList.add('danger');
-  else if (remaining <= 300) box.classList.add('warning');
+function switchTab(t) {
+  const isLogin = t === 'login';
+  document.getElementById('tabLogin').classList.toggle('active', isLogin);
+  document.getElementById('tabReg').classList.toggle('active', !isLogin);
+  document.getElementById('formLogin').style.display = isLogin ? 'block' : 'none';
+  document.getElementById('formReg').style.display = isLogin ? 'none' : 'block';
+  showMsg('', '');
 }
-
-// ========== RENDER ==========
-function renderQuestion() {
-  const app = document.getElementById('app');
-  const q = questions[currentIndex];
-  const total = questions.length;
-
-  document.getElementById('curNum').textContent = currentIndex + 1;
-  const answeredCount = Object.keys(answers).filter(k => answers[k] !== '' && answers[k] !== undefined).length;
-  document.getElementById('answeredNum').textContent = answeredCount;
-  const pct = ((currentIndex + 1) / total) * 100;
-  document.getElementById('progressFill').style.width = pct + '%';
-
-  let mediaHtml = '';
-  if (q.gambar) mediaHtml += `<img src="${q.gambar}" alt="gambar soal" onerror="this.style.display='none'">`;
-  if (q.audio)  mediaHtml += `<audio controls preload="metadata" style="width:100%;"><source src="${q.audio}"></audio>`;
-
-  let optionsHtml = '';
-  if (q.section === 'isian') {
-    const val = (answers[currentIndex] || '').replace(/"/g, '&quot;');
-    optionsHtml = `
-      <input type="text" class="fill-input" id="fillInput"
-             placeholder="답을 입력하세요..." value="${val}"
-             oninput="saveAnswer(this.value)">
-    `;
-  } else {
-    const opts = [
-      { n:'1', t:q.opsiA },
-      { n:'2', t:q.opsiB },
-      { n:'3', t:q.opsiC },
-      { n:'4', t:q.opsiD }
-    ].filter(o => o.t);
-
-    const cls = (q.section === 'pilihan_gambar') ? '' : 'vertical';
-
-    optionsHtml = `<ul class="options ${cls}">`;
-    opts.forEach(o => {
-      const sel = String(answers[currentIndex]) === o.n ? 'selected' : '';
-      optionsHtml += `
-        <li class="${sel}" onclick="selectAnswer('${o.n}')">
-          <span class="circle">${CIRCLES[o.n]}</span>
-          <span>${o.t}</span>
-        </li>
-      `;
-    });
-    optionsHtml += '</ul>';
-  }
-
-  const hasMedia = mediaHtml !== '';
-  const bodyHtml = hasMedia
-    ? `<div class="question-body">
-         <div class="question-media">${mediaHtml}</div>
-         <div class="question-content">
-           ${q.soal ? `<div class="question-text">${q.soal}</div>` : ''}
-           ${optionsHtml}
-         </div>
-       </div>`
-    : `<div class="question-body" style="padding-left:0;">
-         <div class="question-content">
-           ${q.soal ? `<div class="question-text">${q.soal}</div>` : ''}
-           ${optionsHtml}
-         </div>
-       </div>`;
-
-  const isFirst = currentIndex === 0;
-  const isLast  = currentIndex === total - 1;
-
-  app.innerHTML = `
-    <div class="exam-paper fade" id="paper">
-      <div class="exam-title">고용허가제 한국어능력시험 (EPS-TOPIK)</div>
-      <div class="exam-heading">읽기 ( ${total} 문항 )</div>
-      <div class="question">
-        <div class="question-num">${currentIndex + 1}</div>
-        ${bodyHtml}
-      </div>
-    </div>
-    <div class="nav-bar">
-      <button class="btn btn-secondary" onclick="prevQuestion()" ${isFirst ? 'disabled' : ''}>
-        <i class="fas fa-arrow-left"></i> 이전
-      </button>
-      ${isLast
-        ? `<button class="btn btn-success" onclick="finishExam(false)">
-             <i class="fas fa-check"></i> 제출 & 결과보기
-           </button>`
-        : `<button class="btn btn-primary" onclick="nextQuestion()">
-             다음 <i class="fas fa-arrow-right"></i>
-           </button>`}
-    </div>
-  `;
-  window.scrollTo({top: 0, behavior: 'smooth'});
+function showMsg(text, type) {
+  const el = document.getElementById('msg');
+  el.textContent = text;
+  el.className = 'msg ' + (type || '');
 }
-
-// ========== SELECT ==========
-function selectAnswer(num) {
-  answers[currentIndex] = num;
-  document.querySelectorAll('.options li').forEach(li => {
-    const circle = li.querySelector('.circle').textContent;
-    li.classList.toggle('selected', circle === CIRCLES[num]);
-  });
-  updateAnsweredCount();
+async function post(payload) {
+  const r = await fetch(API, { method: 'POST', headers: {'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(payload) });
+  const t = await r.text();
+  try { return JSON.parse(t); } catch(e) { return { success:false, msg:'Response tidak valid' }; }
 }
-
-function saveAnswer(val) {
-  answers[currentIndex] = val;
-  updateAnsweredCount();
+function detectMsgType(msg) {
+  if (msg && (msg.includes('⚠️') || msg.toLowerCase().includes('terlalu banyak'))) return 'warn';
+  return 'err';
 }
-
-function updateAnsweredCount() {
-  const n = Object.keys(answers).filter(k => answers[k] !== '' && answers[k] !== undefined).length;
-  document.getElementById('answeredNum').textContent = n;
-}
-
-// ========== NAV ==========
-function nextQuestion() { if (currentIndex < questions.length - 1) { currentIndex++; renderQuestion(); } }
-function prevQuestion() { if (currentIndex > 0) { currentIndex--; renderQuestion(); } }
-
-// ========== FINISH ==========
-function finishExam(timeUp) {
-  if (isFinished) return;
-  if (!timeUp && !confirm('Yakin ingin menyelesaikan ujian dan lihat hasil?')) return;
-
-  isFinished = true;
-  clearInterval(timerInterval);
-
-  let correct = 0, wrong = 0, blank = 0;
-  questions.forEach((q, i) => {
-    const ua = (answers[i] || '').toString().trim();
-    const ca = (q.jawaban || '').toString().trim();
-    if (!ua) { blank++; return; }
-    if (q.section === 'isian') {
-      if (ua.toLowerCase() === ca.toLowerCase()) correct++; else wrong++;
+async function doLogin(e) {
+  e.preventDefault();
+  const username = document.getElementById('loginUser').value.trim();
+  const password = document.getElementById('loginPass').value;
+  const btn = document.getElementById('btnLogin');
+  const original = btn.innerHTML;
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Memproses...';
+  showMsg('', '');
+  try {
+    const res = await post({ action:'login', username, password });
+    if (res.success) {
+      localStorage.setItem('user', JSON.stringify(res.user));
+      const roleLabel = res.user.role === 'admin' ? 'Admin' : 'Pelajar';
+      showMsg(`✅ Login berhasil sebagai ${roleLabel}! Mengalihkan...`, 'ok');
+      setTimeout(() => location.href = 'dashboard.html', 700);
     } else {
-      if (ua === ca) correct++; else wrong++;
+      showMsg('❌ ' + (res.msg || 'Login gagal'), detectMsgType(res.msg));
     }
-  });
-
-  const total = questions.length;
-  const score = Math.round((correct / total) * 100);
-
-  document.getElementById('examInfo').style.display = 'none';
-  document.getElementById('progressWrap').style.display = 'none';
-
-  let grade = 'A', color = '#2fa36b';
-  if (score < 90) { grade = 'B'; color = '#2fa36b'; }
-  if (score < 80) { grade = 'C'; color = '#f0ad4e'; }
-  if (score < 70) { grade = 'D'; color = '#f0ad4e'; }
-  if (score < 60) { grade = 'E'; color = '#d9534f'; }
-
-  document.getElementById('app').innerHTML = `
-    <div class="result-wrap fade">
-      <h1>Ujian Selesai 🎉</h1>
-      <p class="sub">${timeUp ? '⏰ Waktu habis' : 'Terima kasih telah mengerjakan'}</p>
-
-      <div class="score-big" style="background:${color}">
-        <div class="num">${score}</div>
-        <div class="lbl">SCORE</div>
-      </div>
-      <p style="font-size:18px;font-weight:700;color:${color};margin-bottom:20px;">Grade ${grade}</p>
-
-      <div class="stat-grid">
-        <div class="stat green"><div class="n">${correct}</div><div class="l">정답 (Benar)</div></div>
-        <div class="stat red"><div class="n">${wrong}</div><div class="l">오답 (Salah)</div></div>
-        <div class="stat gray"><div class="n">${blank}</div><div class="l">미응답 (Kosong)</div></div>
-      </div>
-
-      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:10px;">
-        <button class="btn btn-primary" onclick="location.reload()">
-          <i class="fas fa-redo"></i> Ulangi
-        </button>
-        <button class="btn btn-secondary" onclick="showReview()">
-          <i class="fas fa-list"></i> Review Jawaban
-        </button>
-      </div>
-
-      <div id="reviewBox" style="display:none;margin-top:28px;"></div>
-    </div>
-  `;
-  window.scrollTo({top: 0, behavior: 'smooth'});
+  } catch(err) { showMsg('❌ ' + err.message, 'err'); }
+  finally { btn.disabled = false; btn.innerHTML = original; }
 }
-
-// ========== REVIEW ==========
-function showReview() {
-  const box = document.getElementById('reviewBox');
-  if (box.style.display === 'block') { box.style.display = 'none'; return; }
-
-  let html = '';
-  questions.forEach((q, i) => {
-    const ua = (answers[i] || '').toString().trim();
-    const ca = (q.jawaban || '').toString().trim();
-    let ok = false;
-    if (q.section === 'isian') ok = ua.toLowerCase() === ca.toLowerCase();
-    else ok = ua === ca;
-
-    const dispUA = (q.section === 'isian') ? (ua || '(kosong)') : (CIRCLES[ua] || ua || '(kosong)');
-    const dispCA = (q.section === 'isian') ? ca : (CIRCLES[ca] || ca);
-
-    html += `
-      <div class="review-item ${ok ? 'correct' : 'wrong'}">
-        <div class="rhead">
-          <span>Soal ${i + 1}</span>
-          <span class="${ok ? 'ok' : 'no'}">${ok ? '✓ Benar' : '✗ Salah'}</span>
-        </div>
-        <div class="rq">${q.soal || '(gambar/audio)'}</div>
-        <div class="ra">
-          Jawaban Anda: <strong>${dispUA}</strong><br>
-          Jawaban Benar: <strong style="color:#2fa36b;">${dispCA}</strong>
-          ${q.pembahasan ? `<br><br><strong>Pembahasan:</strong> ${q.pembahasan}` : ''}
-        </div>
-      </div>
-    `;
-  });
-  box.innerHTML = html;
-  box.style.display = 'block';
+async function doRegister(e) {
+  e.preventDefault();
+  const nama = document.getElementById('regNama').value.trim();
+  const username = document.getElementById('regUser').value.trim();
+  const password = document.getElementById('regPass').value;
+  const btn = document.getElementById('btnReg');
+  const original = btn.innerHTML;
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Memproses...';
+  showMsg('', '');
+  try {
+    const res = await post({ action:'register', username, password, nama });
+    if (res.success) {
+      showMsg('✅ Pendaftaran berhasil! Silakan login.', 'ok');
+      document.getElementById('formReg').reset();
+      switchTab('login');
+      document.getElementById('loginUser').value = username;
+      document.getElementById('loginPass').focus();
+    } else {
+      showMsg('❌ ' + (res.msg || 'Gagal daftar'), detectMsgType(res.msg));
+    }
+  } catch(err) { showMsg('❌ ' + err.message, 'err'); }
+  finally { btn.disabled = false; btn.innerHTML = original; }
 }
-
-// ========== INIT ==========
-loadQuestions();
 </script>
 </body>
 </html>
