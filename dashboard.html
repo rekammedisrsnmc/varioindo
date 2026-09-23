@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — EPS-TOPIK</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{
+  --bg:#f5f7fa; --card-bg:#fff; --card-shadow:0 4px 16px rgba(0,0,0,.06);
+  --text:#333; --text-muted:#888; --title-color:#154a82; --link-color:#1e5fa8;
+  --border:#d0d7e2; --topbar-bg:#fff; --topbar-shadow:0 4px 16px rgba(0,0,0,.08);
+  --sub-bg:#f5f7fa; --stat-bg:#fff; --section-title:#555;
+  --menu-hover-shadow:0 12px 30px rgba(30,95,168,.18);
+  --tag-bg:#e8f0fa; --tag-text:#1e5fa8;
+}
+[data-theme="dark"]{
+  --bg:#0a111f; --card-bg:#151d2e; --card-shadow:0 4px 16px rgba(0,0,0,.4);
+  --text:#e8eef7; --text-muted:#8b9bb4; --title-color:#5b9cff; --link-color:#5b9cff;
+  --border:#2a3448; --topbar-bg:#151d2e; --topbar-shadow:0 4px 16px rgba(0,0,0,.4);
+  --sub-bg:#0f1626; --stat-bg:#1a2233; --section-title:#8b9bb4;
+  --menu-hover-shadow:0 12px 30px rgba(91,156,255,.25);
+  --tag-bg:#1e3556; --tag-text:#5b9cff;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI','Malgun Gothic',-apple-system,sans-serif;}
+body{background:var(--bg);min-height:100vh;color:var(--text);transition:background .3s,color .3s;}
+.topbar{background:var(--topbar-bg);padding:16px 24px;box-shadow:var(--topbar-shadow);display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10;transition:background .3s;}
+.topbar h1{font-size:18px;color:var(--title-color);display:flex;align-items:center;gap:10px;}
+.topbar h1 i{color:var(--link-color);}
+.topbar .spacer{flex:1;}
+.topbar .user{font-size:13px;color:var(--text-muted);display:flex;align-items:center;gap:8px;}
+.topbar .user strong{color:var(--link-color);}
+.topbar .avatar-mini{width:28px;height:28px;border-radius:50%;object-fit:cover;border:2px solid var(--link-color);}
+.topbar .avatar-init{width:28px;height:28px;border-radius:50%;background:var(--link-color);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
+.topbar .user .badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700;}
+.topbar .user .badge.admin{background:#fde8e8;color:#a33;}
+.topbar .user .badge.user{background:var(--tag-bg);color:var(--tag-text);}
+.topbar .btn-icon{background:transparent;border:1.5px solid var(--border);color:var(--text);width:38px;height:38px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:.2s;position:relative;text-decoration:none;}
+.topbar .btn-icon:hover{background:var(--sub-bg);border-color:var(--link-color);color:var(--link-color);}
+.topbar .btn-icon .notif-badge{
+  position:absolute;top:-2px;right:-2px;
+  background:#d9534f;color:#fff;font-size:10px;font-weight:800;
+  min-width:18px;height:18px;padding:0 5px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  border:2px solid var(--topbar-bg);
+  animation:pulse-badge 1.5s infinite;
+}
+@keyframes pulse-badge{0%,100%{transform:scale(1);}50%{transform:scale(1.1);}}
+.topbar .logout{color:#d9534f;text-decoration:none;font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;transition:.2s;}
+.topbar .logout:hover{background:#fde8e8;}
+.wrap{max-width:1000px;margin:30px auto;padding:0 20px;}
+.hello{font-size:24px;color:var(--text);margin-bottom:6px;}
+.hello strong{color:var(--link-color);}
+.sub{color:var(--text-muted);font-size:14px;margin-bottom:30px;}
+
+.quota-banner{background:linear-gradient(135deg,#1e5fa8,#154a82);color:#fff;border-radius:14px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;box-shadow:0 8px 24px rgba(30,95,168,.25);}
+.quota-banner.empty{background:linear-gradient(135deg,#d9534f,#c9302c);box-shadow:0 8px 24px rgba(217,83,79,.3);}
+.quota-banner .ico-big{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.quota-banner .txt{flex:1;min-width:200px;}
+.quota-banner .txt h3{font-size:16px;font-weight:700;margin-bottom:4px;}
+.quota-banner .txt p{font-size:13px;opacity:.9;line-height:1.5;}
+.quota-banner .quota-badge{background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4);padding:8px 20px;border-radius:30px;font-weight:800;font-size:18px;letter-spacing:1px;}
+.quota-banner .btn-request{background:#fff;color:#d9534f;border:none;padding:10px 20px;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:8px;transition:.2s;}
+.quota-banner .btn-request:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.2);}
+
+.quick-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:26px;}
+.qs{background:var(--stat-bg);border-radius:12px;padding:18px 20px;box-shadow:var(--card-shadow);display:flex;align-items:center;gap:14px;transition:.3s;}
+.qs .icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;flex-shrink:0;}
+.qs .icon.blue{background:linear-gradient(135deg,#1e5fa8,#154a82);}
+.qs .icon.green{background:linear-gradient(135deg,#2fa36b,#1f7f53);}
+.qs .icon.orange{background:linear-gradient(135deg,#f0ad4e,#ec971f);}
+.qs .val{font-size:22px;font-weight:800;color:var(--link-color);line-height:1;}
+.qs .lbl{font-size:12px;color:var(--text-muted);margin-top:4px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px;}
+.menu{background:var(--card-bg);border-radius:14px;padding:26px;box-shadow:var(--card-shadow);transition:.25s;text-decoration:none;color:inherit;display:block;border:2px solid transparent;position:relative;overflow:hidden;}
+.menu:hover{transform:translateY(-4px);box-shadow:var(--menu-hover-shadow);border-color:var(--link-color);}
+.menu.admin-card{border-color:#d9534f;}
+.menu.profile-card{border-color:#7c4dff;}
+.menu.history-card{border-color:#f0ad4e;}
+.menu.help-card{border-color:#26a69a;}
+.menu.help-card:hover{border-color:#00796b;box-shadow:0 12px 30px rgba(38,166,154,.25);}
+.menu.locked{opacity:.55;cursor:not-allowed;pointer-events:none;}
+.menu.locked::after{content:'🔒 KUOTA HABIS';position:absolute;top:12px;right:12px;background:#d9534f;color:#fff;font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;letter-spacing:.5px;}
+.menu .ico{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;margin-bottom:16px;}
+.menu h3{font-size:16px;color:var(--title-color);margin-bottom:6px;}
+.menu p{font-size:13px;color:var(--text-muted);line-height:1.5;}
+.menu .arrow{position:absolute;right:20px;top:50%;transform:translateY(-50%);color:var(--border);font-size:20px;transition:.25s;}
+.menu:hover .arrow{color:var(--link-color);transform:translateY(-50%) translateX(4px);}
+.ico-blue{background:linear-gradient(135deg,#1e5fa8,#154a82);}
+.ico-green{background:linear-gradient(135deg,#2fa36b,#1f7f53);}
+.ico-orange{background:linear-gradient(135deg,#f0ad4e,#ec971f);}
+.ico-red{background:linear-gradient(135deg,#d9534f,#c9302c);}
+.ico-purple{background:linear-gradient(135deg,#7c4dff,#5e35b1);}
+.ico-teal{background:linear-gradient(135deg,#26a69a,#00796b);}
+.footer{text-align:center;padding:30px 20px;color:var(--text-muted);font-size:12px;}
+.section-title{font-size:14px;font-weight:700;color:var(--section-title);margin:26px 0 14px;letter-spacing:1px;text-transform:uppercase;}
+
+.modal-back{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;align-items:center;justify-content:center;padding:20px;}
+.modal-back.show{display:flex;}
+.modal-box{background:var(--card-bg);border-radius:14px;padding:28px;max-width:480px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.4);max-height:90vh;overflow-y:auto;}
+.modal-box h2{color:var(--title-color);margin-bottom:8px;font-size:18px;display:flex;align-items:center;gap:10px;}
+.modal-box p.desc{color:var(--text-muted);font-size:13px;margin-bottom:18px;line-height:1.5;}
+.modal-box label{font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;}
+.modal-box input, .modal-box textarea{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:var(--sub-bg);color:var(--text);margin-bottom:14px;}
+.modal-box textarea{min-height:100px;resize:vertical;}
+.modal-box input:focus, .modal-box textarea:focus{outline:none;border-color:var(--link-color);box-shadow:0 0 0 3px rgba(30,95,168,.15);}
+
+@media(max-width:600px){
+  .wrap{margin:20px auto;}
+  .hello{font-size:20px;}
+  .topbar .user{display:none;}
+  .quick-stats{grid-template-columns:1fr;}
+  .quota-banner{padding:16px;}
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <h1><i class="fas fa-graduation-cap"></i> EPS-TOPIK</h1>
+  <div class="spacer"></div>
+  <span class="user">
+    <span id="avatarBox"></span>
+    <strong id="userName">-</strong>
+    <span class="badge" id="userRole">-</span>
+  </span>
+  <a href="notifikasi.html" class="btn-icon" title="Notifikasi">
+    <i class="fas fa-bell"></i>
+    <span class="notif-badge" id="notifBadge" style="display:none;">0</span>
+  </a>
+  <button class="btn-icon" onclick="toggleTheme()" title="Toggle dark mode"><i class="fas fa-moon" id="themeIcon"></i></button>
+  <a href="#" class="logout" onclick="logout(event)"><i class="fas fa-sign-out-alt"></i> Keluar</a>
+</div>
+
+<div class="wrap">
+  <div class="hello">Halo, <strong id="greetName">User</strong> 👋</div>
+  <p class="sub">Pilih kategori latihan yang mau kamu kerjakan</p>
+
+  <div id="quotaBanner" class="quota-banner" style="display:none;">
+    <div class="ico-big"><i class="fas fa-ticket-alt"></i></div>
+    <div class="txt">
+      <h3 id="quotaTitle">Kuota Ujian</h3>
+      <p id="quotaDesc">-</p>
+    </div>
+    <div class="quota-badge" id="quotaBadge">-/-</div>
+    <button class="btn-request" id="btnRequest" onclick="openRequestModal()" style="display:none;">
+      <i class="fas fa-paper-plane"></i> Minta Tambah Kuota
+    </button>
+  </div>
+
+  <div class="quick-stats">
+    <div class="qs">
+      <div class="icon blue"><i class="fas fa-file-alt"></i></div>
+      <div>
+        <div class="val" id="statTotal">0</div>
+        <div class="lbl">Total Ujian</div>
+      </div>
+    </div>
+    <div class="qs">
+      <div class="icon green"><i class="fas fa-chart-line"></i></div>
+      <div>
+        <div class="val" id="statAvg">0</div>
+        <div class="lbl">Rata-rata Skor</div>
+      </div>
+    </div>
+    <div class="qs">
+      <div class="icon orange"><i class="fas fa-trophy"></i></div>
+      <div>
+        <div class="val" id="statBest">0</div>
+        <div class="lbl">Skor Terbaik</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">👤 Akun Saya</div>
+  <div class="grid" style="margin-bottom:20px;">
+    <a class="menu profile-card" href="profil.html">
+      <div class="ico ico-purple"><i class="fas fa-user-edit"></i></div>
+      <h3>Edit Profil</h3>
+      <p>Ubah nama & upload foto profil untuk sertifikat</p>
+      <i class="fas fa-chevron-right arrow"></i>
+    </a>
+    <a class="menu history-card" href="riwayat.html">
+      <div class="ico ico-orange"><i class="fas fa-history"></i></div>
+      <h3>Riwayat & Sertifikat</h3>
+      <p>Lihat hasil ujian & cetak sertifikat</p>
+      <i class="fas fa-chevron-right arrow"></i>
+    </a>
+    <a class="menu help-card" href="#" onclick="openHelpModal(event)">
+      <div class="ico ico-teal"><i class="fas fa-headset"></i></div>
+      <h3>Butuh Bantuan?</h3>
+      <p>Kirim pertanyaan atau keluhan ke admin</p>
+      <i class="fas fa-chevron-right arrow"></i>
+    </a>
+  </div>
+
+  <div class="section-title">📚 Latihan</div>
+  <div class="grid" id="menuGrid">
+    <a class="menu admin-card" id="menuAdmin" href="admin.html" style="display:none;">
+      <div class="ico ico-red"><i class="fas fa-user-cog"></i></div>
+      <h3>Admin Panel</h3>
+      <p>Kelola soal & user (khusus admin)</p>
+      <i class="fas fa-chevron-right arrow"></i>
+    </a>
+
+    <a class="menu exam-menu" href="ujian.html?kategori=eps">
+      <div class="ico ico-blue"><i class="fas fa-book-open"></i></div>
+      <h3>Soal EPS-TOPIK</h3>
+      <p>Latihan lengkap sesuai standar ujian</p>
+      <i class="fas fa-chevron-right arrow"></i>
+    </a>
+    <a class="menu exam-menu" href="kosakata.html">
+      <div class="ico ico-green"><i class="fas fa-book"></i></div>
+      <h3>Kosakata</h3>
+      <p>Latihan perbendaharaan kata Korea</p>
+      <i class="fas fa-chevron-right arrow"></i>
+    </a>
+    <a class="menu exam-menu" href="ujian.html?kategori=tata_bahasa">
+      <div class="ico ico-orange"><i class="fas fa-spell-check"></i></div>
+      <h3>Tata Bahasa</h3>
+      <p>Latihan grammar & struktur kalimat</p>
+      <i class="fas fa-chevron-right arrow"></i>
+    </a>
+    <a class="menu exam-menu" href="ujian.html?kategori=listening">
+      <div class="ico ico-purple"><i class="fas fa-headphones"></i></div>
+      <h3>Listening</h3>
+      <p>Latihan mendengarkan audio</p>
+      <i class="fas fa-chevron-right arrow"></i>
+    </a>
+    <a class="menu exam-menu" href="ujian.html?kategori=reading">
+      <div class="ico ico-teal"><i class="fas fa-book-reader"></i></div>
+      <h3>Reading</h3>
+      <p>Latihan membaca teks bahasa Korea</p>
+      <i class="fas fa-chevron-right arrow"></i>
+    </a>
+  </div>
+</div>
+
+<div class="footer">© EPS-TOPIK Practice</div>
+
+<!-- MODAL: REQUEST KUOTA -->
+<div id="requestModal" class="modal-back">
+  <div class="modal-box">
+    <h2>📩 Minta Tambah Kuota</h2>
+    <p class="desc">Request kamu akan dikirim ke admin. Admin akan review dan menambahkan kuota ujian.</p>
+    <label>Pesan untuk admin (opsional)</label>
+    <textarea id="requestPesan" placeholder="Contoh: Pak, saya mau latihan lagi buat persiapan ujian..."></textarea>
+    <div style="display:flex;gap:10px;">
+      <button onclick="closeModal('requestModal')" style="flex:1;padding:12px;border:1px solid var(--border);background:var(--sub-bg);color:var(--text);border-radius:8px;font-weight:600;cursor:pointer;font-family:inherit;">Batal</button>
+      <button onclick="submitRequest()" id="btnSubmitReq" style="flex:1;padding:12px;border:none;background:var(--link-color);color:#fff;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fas fa-paper-plane"></i> Kirim</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: BANTUAN -->
+<div id="helpModal" class="modal-back">
+  <div class="modal-box">
+    <h2>🆘 Butuh Bantuan</h2>
+    <p class="desc">Kirim pertanyaan atau keluhan ke admin. Admin akan balas via notifikasi.</p>
+    <label>Subjek <span style="color:#d9534f;">*</span></label>
+    <input type="text" id="helpSubjek" placeholder="Contoh: Tidak bisa login, soal error, dll" maxlength="100">
+    <label>Pesan <span style="color:#d9534f;">*</span></label>
+    <textarea id="helpPesan" placeholder="Jelaskan detail masalah atau pertanyaanmu..." maxlength="1000"></textarea>
+    <div style="display:flex;gap:10px;">
+      <button onclick="closeModal('helpModal')" style="flex:1;padding:12px;border:1px solid var(--border);background:var(--sub-bg);color:var(--text);border-radius:8px;font-weight:600;cursor:pointer;font-family:inherit;">Batal</button>
+      <button onclick="submitHelp()" id="btnSubmitHelp" style="flex:1;padding:12px;border:none;background:#26a69a;color:#fff;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fas fa-paper-plane"></i> Kirim ke Admin</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== DARK MODE =====
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  const icon = document.getElementById('themeIcon');
+  if (icon) icon.className = t === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+}
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme') || 'light';
+  const next = cur === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('theme', next);
+  applyTheme(next);
+}
+applyTheme(localStorage.getItem('theme') || 'light');
+
+const API = 'https://script.google.com/macros/s/AKfycbw4Cr9QZTpNznxAWBed0Nt0KBsiyb2JSfKw-aADolR01SIoUcf8c370pvaKFHiaEpmb/exec';
+
+let user = JSON.parse(localStorage.getItem('user') || 'null');
+if (!user) location.href = 'login.html';
+
+document.getElementById('userName').textContent = user.nama || user.username;
+document.getElementById('greetName').textContent = user.nama || user.username;
+
+// Avatar
+const avBox = document.getElementById('avatarBox');
+if (user.foto) {
+  avBox.innerHTML = `<img src="${user.foto}" class="avatar-mini" onerror="this.style.display='none'">`;
+} else {
+  const init = (user.nama || user.username).charAt(0).toUpperCase();
+  avBox.innerHTML = `<div class="avatar-init">${init}</div>`;
+}
+
+const badge = document.getElementById('userRole');
+if (user.role === 'admin') {
+  badge.textContent = 'ADMIN';
+  badge.className = 'badge admin';
+  document.getElementById('menuAdmin').style.display = 'block';
+} else {
+  badge.textContent = 'PELAJAR';
+  badge.className = 'badge user';
+}
+
+// ===== NOTIF BADGE =====
+function updateNotifBadge() {
+  fetch(API + '?action=getUnreadCount&username=' + encodeURIComponent(user.username) + '&t=' + Date.now())
+    .then(r => r.json())
+    .then(res => {
+      if (res.success) {
+        const badge = document.getElementById('notifBadge');
+        if (res.count > 0) {
+          badge.textContent = res.count > 99 ? '99+' : res.count;
+          badge.style.display = 'flex';
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+    })
+    .catch(() => {});
+}
+
+// Auto refresh badge tiap 30 detik
+setInterval(updateNotifBadge, 30000);
+
+// ===== KUOTA =====
+function updateQuotaUI() {
+  const banner = document.getElementById('quotaBanner');
+  const badge = document.getElementById('quotaBadge');
+  const title = document.getElementById('quotaTitle');
+  const desc = document.getElementById('quotaDesc');
+  const btnReq = document.getElementById('btnRequest');
+
+  if (user.role === 'admin') {
+    banner.style.display = 'none';
+    document.querySelectorAll('.exam-menu').forEach(m => m.classList.remove('locked'));
+    return;
+  }
+  banner.style.display = 'flex';
+  const used = user.quotaUsed || 0;
+  const max = user.quotaMax || 3;
+  const remain = Math.max(0, max - used);
+  badge.textContent = `${remain}/${max}`;
+
+  if (remain > 0) {
+    banner.classList.remove('empty');
+    title.textContent = `Kuota Ujian: ${remain} tersisa`;
+    desc.textContent = `Kamu sudah pakai ${used} dari ${max} kuota.`;
+    btnReq.style.display = 'none';
+    document.querySelectorAll('.exam-menu').forEach(m => m.classList.remove('locked'));
+  } else {
+    banner.classList.add('empty');
+    title.textContent = `Kuota Ujian Habis`;
+    desc.textContent = `Kamu sudah pakai ${used} dari ${max} kuota. Hubungi admin untuk tambah kuota.`;
+    btnReq.style.display = 'inline-flex';
+    document.querySelectorAll('.exam-menu').forEach(m => m.classList.add('locked'));
+  }
+}
+
+function refreshQuota() {
+  return fetch(API + '?action=getQuota&username=' + encodeURIComponent(user.username) + '&t=' + Date.now())
+    .then(r => r.json())
+    .then(res => {
+      if (res.success) {
+        user.quotaUsed = res.quotaUsed;
+        user.quotaMax = res.quotaMax;
+        localStorage.setItem('user', JSON.stringify(user));
+        updateQuotaUI();
+      }
+    })
+    .catch(() => {});
+}
+
+// Stats
+fetch(API + '?action=getHistory&username=' + encodeURIComponent(user.username) + '&t=' + Date.now())
+  .then(r => r.json())
+  .then(hist => {
+    if (!Array.isArray(hist) || hist.length === 0) return;
+    document.getElementById('statTotal').textContent = hist.length;
+    const avg = Math.round(hist.reduce((s, h) => s + h.skor, 0) / hist.length);
+    const best = Math.max.apply(null, hist.map(h => h.skor));
+    document.getElementById('statAvg').textContent = avg;
+    document.getElementById('statBest').textContent = best;
+  })
+  .catch(() => {});
+
+// Modal
+function openModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+function openRequestModal() { openModal('requestModal'); }
+
+function openHelpModal(e) {
+  e.preventDefault();
+  document.getElementById('helpSubjek').value = '';
+  document.getElementById('helpPesan').value = '';
+  openModal('helpModal');
+}
+
+async function submitRequest() {
+  const pesan = document.getElementById('requestPesan').value.trim();
+  const btn = document.getElementById('btnSubmitReq');
+  const original = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
+  try {
+    const r = await fetch(API, {
+      method: 'POST', headers: {'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify({ action: 'requestQuota', username: user.username, pesan })
+    });
+    const res = await r.json();
+    if (res.success) {
+      alert('✅ Request terkirim! Admin akan review segera.');
+      closeModal('requestModal');
+      document.getElementById('requestPesan').value = '';
+    } else alert('❌ ' + (res.msg || 'Gagal'));
+  } catch(err) { alert('❌ ' + err.message); }
+  finally { btn.disabled = false; btn.innerHTML = original; }
+}
+
+async function submitHelp() {
+  const subjek = document.getElementById('helpSubjek').value.trim();
+  const pesan = document.getElementById('helpPesan').value.trim();
+  if (!subjek) { alert('Subjek wajib diisi'); return; }
+  if (!pesan) { alert('Pesan wajib diisi'); return; }
+
+  const btn = document.getElementById('btnSubmitHelp');
+  const original = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
+  try {
+    const r = await fetch(API, {
+      method: 'POST', headers: {'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify({ action: 'createTicket', username: user.username, subjek, pesan })
+    });
+    const res = await r.json();
+    if (res.success) {
+      alert('✅ Pesan terkirim! Admin akan balas via notifikasi.');
+      closeModal('helpModal');
+      document.getElementById('helpSubjek').value = '';
+      document.getElementById('helpPesan').value = '';
+      setTimeout(updateNotifBadge, 1000);
+    } else alert('❌ ' + (res.msg || 'Gagal'));
+  } catch(err) { alert('❌ ' + err.message); }
+  finally { btn.disabled = false; btn.innerHTML = original; }
+}
+
+function logout(e) {
+  e.preventDefault();
+  if (!confirm('Yakin mau keluar?')) return;
+  localStorage.removeItem('user');
+  location.href = 'login.html';
+}
+
+// INIT
+updateQuotaUI();
+refreshQuota();
+updateNotifBadge();
+</script>
+</body>
+</html>
