@@ -29,6 +29,7 @@ body{background:var(--bg);min-height:100vh;color:var(--text);transition:backgrou
 .exam-title{text-align:center;font-size:14px;color:var(--muted);margin-bottom:6px;letter-spacing:2px;text-transform:uppercase;font-weight:600;}
 .exam-heading{text-align:center;font-size:24px;font-weight:800;margin:8px 0 6px 0;color:var(--blue);letter-spacing:1px;}
 .exam-subtitle{text-align:center;font-size:13px;color:var(--muted);margin-bottom:28px;}
+.tema-badge{display:inline-block;padding:4px 14px;border-radius:20px;font-size:11px;font-weight:800;background:linear-gradient(135deg,#2fa36b,#26a69a);color:#fff;letter-spacing:1.5px;margin:0 auto 16px;text-align:center;display:table;}
 .question{margin-bottom:32px;}
 .question-num{font-size:13px;font-weight:700;color:var(--blue);margin-bottom:10px;display:inline-block;background:var(--blue-light);padding:4px 12px;border-radius:20px;letter-spacing:1px;}
 .question-body{display:flex;gap:24px;align-items:flex-start;}
@@ -37,7 +38,6 @@ body{background:var(--bg);min-height:100vh;color:var(--text);transition:backgrou
 .question-text{font-size:17px;line-height:1.7;color:var(--text);margin-bottom:12px;font-weight:500;}
 .question-content{flex:1;min-width:0;}
 .question-media audio{width:100%;margin-top:8px;}
-.kategori-badge{display:inline-block;padding:3px 12px;border-radius:20px;font-size:10px;font-weight:800;background:linear-gradient(135deg,#2fa36b,#26a69a);color:#fff;margin-bottom:10px;letter-spacing:1.5px;}
 .options{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
 .options.vertical{grid-template-columns:1fr;}
 .options li{font-size:15px;line-height:1.5;color:var(--text);padding:12px 16px;border-radius:10px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:10px;border:2px solid var(--border);user-select:none;background:var(--card-bg);}
@@ -102,13 +102,10 @@ body{background:var(--bg);min-height:100vh;color:var(--text);transition:backgrou
 footer{text-align:center;padding:24px 20px;color:var(--muted);font-size:13px;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(15px)}to{opacity:1}}
 .fade{animation:fadeUp .4s ease;}
-
-/* Blocked */
 .blocked-wrap{max-width:600px;margin:60px auto;padding:40px;background:var(--card-bg);border-radius:16px;box-shadow:var(--shadow);text-align:center;}
 .blocked-wrap .icon-big{font-size:64px;margin-bottom:16px;}
 .blocked-wrap h1{color:var(--red);margin-bottom:12px;font-size:22px;}
 .blocked-wrap p{color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:24px;}
-
 @media(max-width:700px){
   .exam-paper{padding:28px 20px;margin:15px;border-radius:12px;}
   .nav-bar{padding:0 20px;}
@@ -157,12 +154,36 @@ function toggleTheme(){
 }
 applyTheme(localStorage.getItem('theme') || 'light');
 
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw4Cr9QZTpNznxAWBed0Nt0KBsiyb2JSfKw-aADolR01SIoUcf8c370pvaKFHiaEpmb/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx58rhLwaHCDxRlrAy6mDeSKLFat0hHcwW565Sj66taWCJZL4CE-vCnwsuK44Iw7FHR/exec';
 
 const _user = JSON.parse(localStorage.getItem('user') || 'null');
 if (!_user) location.href = 'login.html';
 
-const kategori = 'kosakata';
+// ===== DAFTAR TEMA =====
+const TEMA_MAP = {
+  'transportasi':   { label: 'Transportasi',     icon: 'fa-bus',            icoClass: 'ico-transportasi' },
+  'makanan':        { label: 'Makanan & Minuman', icon: 'fa-utensils',      icoClass: 'ico-makanan' },
+  'tempat_wisata':  { label: 'Tempat Wisata',    icon: 'fa-landmark',      icoClass: 'ico-wisata' },
+  'keluarga':       { label: 'Keluarga',         icon: 'fa-users',         icoClass: 'ico-keluarga' },
+  'sekolah':        { label: 'Sekolah',          icon: 'fa-graduation-cap', icoClass: 'ico-sekolah' },
+  'tubuh':          { label: 'Anggota Tubuh',    icon: 'fa-hand-paper',    icoClass: 'ico-tubuh' },
+  'pakaian':        { label: 'Pakaian',          icon: 'fa-tshirt',        icoClass: 'ico-pakaian' },
+  'alam':           { label: 'Alam & Cuaca',     icon: 'fa-cloud-sun',     icoClass: 'ico-alam' },
+  'pekerjaan':      { label: 'Pekerjaan',        icon: 'fa-briefcase',     icoClass: 'ico-pekerjaan' },
+  'hobi':           { label: 'Hobi & Olahraga',  icon: 'fa-futbol',        icoClass: 'ico-hobi' },
+  'umum':           { label: 'Kosakata Umum',    icon: 'fa-book',          icoClass: 'ico-umum' }
+};
+
+// ===== BACA TEMA DARI URL =====
+const params = new URLSearchParams(location.search);
+const tema = params.get('tema') || 'umum';
+const temaInfo = TEMA_MAP[tema] || { label: 'Kosakata', icon: 'fa-book' };
+const isSemuaTema = (tema === 'semua');
+
+// Kategori yang dikirim ke API
+// Kalau "semua" → query semua yang berawalan kosakata_
+// Kalau tema spesifik → kosakata_<tema>
+const kategoriQuery = isSemuaTema ? 'kosakata' : 'kosakata_' + tema;
 
 let questions = [];
 let currentIndex = 0;
@@ -210,21 +231,32 @@ async function loadQuestions() {
   if (!canExam) { showBlockedScreen(); return; }
 
   app.innerHTML = `<div class="spinner-container"><div class="spinner"></div><p>Memuat soal kosakata...</p></div>`;
-  const url = APPS_SCRIPT_URL + '?action=getData&kategori=kosakata&t=' + Date.now();
+
+  // Kalau "semua", panggil getData tanpa filter, terus filter client-side
+  const url = isSemuaTema
+    ? APPS_SCRIPT_URL + '?action=getData&kategori=all&t=' + Date.now()
+    : APPS_SCRIPT_URL + '?action=getData&kategori=' + encodeURIComponent(kategoriQuery) + '&t=' + Date.now();
 
   fetch(url)
     .then(res => { if (!res.ok) throw new Error('Network error'); return res.json(); })
     .then(data => {
-      if (Array.isArray(data) && data.length > 0) {
-        questions = data;
+      let filtered = Array.isArray(data) ? data : [];
+
+      // Kalau "semua tema", filter cuma yang berawalan "kosakata"
+      if (isSemuaTema) {
+        filtered = filtered.filter(q => String(q.kategori || '').toLowerCase().startsWith('kosakata'));
+      }
+
+      if (filtered.length > 0) {
+        questions = filtered;
         startExam();
       } else {
         app.innerHTML = `
           <div class="result-wrap">
             <div class="exam-icon">📭</div>
-            <h1>Belum Ada Soal Kosakata</h1>
-            <p class="sub">Kategori "Kosakata" belum punya soal.<br>Silakan hubungi admin.</p>
-            <a href="dashboard.html" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Kembali</a>
+            <h1>Belum Ada Soal</h1>
+            <p class="sub">Tema <strong>${isSemuaTema ? 'Semua Tema' : temaInfo.label}</strong> belum punya soal.<br>Silakan hubungi admin.</p>
+            <a href="dashboard.html" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Kembali ke Dashboard</a>
           </div>`;
       }
     })
@@ -302,11 +334,14 @@ function renderQuestion() {
     optionsHtml += '</ul>';
   }
 
-  const katBadge = `<div class="kategori-badge">📚 KOSAKATA</div>`;
+  const badgeHtml = isSemuaTema
+    ? `<div class="tema-badge">📚 SEMUA TEMA</div>`
+    : `<div class="tema-badge">📚 ${temaInfo.label.toUpperCase()}</div>`;
+
   const hasMedia = mediaHtml !== '';
   const bodyHtml = hasMedia
-    ? `<div class="question-body"><div class="question-media">${mediaHtml}</div><div class="question-content">${katBadge}${q.soal ? `<div class="question-text">${q.soal}</div>` : ''}${optionsHtml}</div></div>`
-    : `<div class="question-body"><div class="question-content">${katBadge}${q.soal ? `<div class="question-text">${q.soal}</div>` : ''}${optionsHtml}</div></div>`;
+    ? `<div class="question-body"><div class="question-media">${mediaHtml}</div><div class="question-content">${q.soal ? `<div class="question-text">${q.soal}</div>` : ''}${optionsHtml}</div></div>`
+    : `<div class="question-body"><div class="question-content">${q.soal ? `<div class="question-text">${q.soal}</div>` : ''}${optionsHtml}</div></div>`;
 
   const isFirst = currentIndex === 0;
   const isLast = currentIndex === total - 1;
@@ -317,6 +352,7 @@ function renderQuestion() {
       <div class="exam-title">Korean Vocabulary Practice</div>
       <div class="exam-heading">Kosakata 한국어</div>
       <div class="exam-subtitle">Latihan perbendaharaan kata bahasa Korea</div>
+      ${badgeHtml}
       <div class="question">
         <div class="question-num">Soal ${currentIndex + 1} dari ${total}</div>
         ${bodyHtml}
@@ -398,6 +434,7 @@ function finishExam(timeUp) {
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px;">
         <a href="dashboard.html" class="btn btn-secondary"><i class="fas fa-home"></i> Dashboard</a>
         <a href="riwayat.html" class="btn btn-warning"><i class="fas fa-history"></i> Riwayat</a>
+        <button class="btn btn-primary" onclick="location.reload()"><i class="fas fa-redo"></i> Ulangi</button>
         <button class="btn btn-success" onclick="showReview()"><i class="fas fa-list"></i> Review Jawaban</button>
       </div>
       <div id="reviewBox" style="display:none;margin-top:28px;"></div>
@@ -413,13 +450,16 @@ function saveResultToServer(skor, benar, salah, kosong, total) {
   const statusBox = document.getElementById('saveStatus');
   if (statusBox) statusBox.innerHTML = '<span class="saved-badge"><i class="fas fa-spinner fa-spin"></i> Menyimpan hasil...</span>';
 
+  // Simpan kategori dengan format: kosakata_<tema> (atau "kosakata" kalau semua tema)
+  const saveKategori = isSemuaTema ? 'kosakata' : 'kosakata_' + tema;
+
   fetch(APPS_SCRIPT_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
     body: JSON.stringify({
       action: 'saveResult',
       username: _user.username,
-      kategori: 'kosakata',
+      kategori: saveKategori,
       skor, benar, salah, kosong, total,
       benarListening: 0, totalListening: 0,
       benarReading: benar, totalReading: total
