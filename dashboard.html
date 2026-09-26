@@ -13,6 +13,7 @@
   --sub-bg:#f5f7fa; --stat-bg:#fff; --section-title:#555;
   --menu-hover-shadow:0 12px 30px rgba(30,95,168,.18);
   --tag-bg:#e8f0fa; --tag-text:#1e5fa8;
+  --dropdown-bg:#fff; --dropdown-shadow:0 8px 24px rgba(0,0,0,.15);
 }
 [data-theme="dark"]{
   --bg:#0a111f; --card-bg:#151d2e; --card-shadow:0 4px 16px rgba(0,0,0,.4);
@@ -21,10 +22,11 @@
   --sub-bg:#0f1626; --stat-bg:#1a2233; --section-title:#8b9bb4;
   --menu-hover-shadow:0 12px 30px rgba(91,156,255,.25);
   --tag-bg:#1e3556; --tag-text:#5b9cff;
+  --dropdown-bg:#1a2233; --dropdown-shadow:0 8px 24px rgba(0,0,0,.5);
 }
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI','Malgun Gothic',-apple-system,sans-serif;}
 body{background:var(--bg);min-height:100vh;color:var(--text);transition:background .3s,color .3s;}
-.topbar{background:var(--topbar-bg);padding:16px 24px;box-shadow:var(--topbar-shadow);display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10;transition:background .3s;}
+.topbar{background:var(--topbar-bg);padding:16px 24px;box-shadow:var(--topbar-shadow);display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50;transition:background .3s;}
 .topbar h1{font-size:18px;color:var(--title-color);display:flex;align-items:center;gap:10px;}
 .topbar h1 i{color:var(--link-color);}
 .topbar .spacer{flex:1;}
@@ -72,7 +74,9 @@ body{background:var(--bg);min-height:100vh;color:var(--text);transition:backgrou
 .qs .val{font-size:22px;font-weight:800;color:var(--link-color);line-height:1;}
 .qs .lbl{font-size:12px;color:var(--text-muted);margin-top:4px;}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px;}
-.menu{background:var(--card-bg);border-radius:14px;padding:26px;box-shadow:var(--card-shadow);transition:.25s;text-decoration:none;color:inherit;display:block;border:2px solid transparent;position:relative;overflow:hidden;}
+
+/* Menu card */
+.menu{background:var(--card-bg);border-radius:14px;padding:26px;box-shadow:var(--card-shadow);transition:.25s;text-decoration:none;color:inherit;display:block;border:2px solid transparent;position:relative;overflow:visible;}
 .menu:hover{transform:translateY(-4px);box-shadow:var(--menu-hover-shadow);border-color:var(--link-color);}
 .menu.admin-card{border-color:#d9534f;}
 .menu.profile-card{border-color:#7c4dff;}
@@ -95,6 +99,125 @@ body{background:var(--bg);min-height:100vh;color:var(--text);transition:backgrou
 .footer{text-align:center;padding:30px 20px;color:var(--text-muted);font-size:12px;}
 .section-title{font-size:14px;font-weight:700;color:var(--section-title);margin:26px 0 14px;letter-spacing:1px;text-transform:uppercase;}
 
+/* ===== DROPDOWN KOSAKATA ===== */
+.menu-dropdown-wrapper{position:relative;}
+.menu-dropdown-wrapper.open{z-index:60;}
+.menu-with-chevron{cursor:pointer;}
+.menu-with-chevron .chevron{
+  position:absolute;right:20px;top:50%;transform:translateY(-50%);
+  color:var(--border);font-size:16px;transition:.3s;
+}
+.menu-dropdown-wrapper.open .chevron{
+  color:var(--link-color);
+  transform:translateY(-50%) rotate(180deg);
+}
+.menu-dropdown-wrapper.open .menu{
+  border-color:var(--link-color);
+  box-shadow:var(--menu-hover-shadow);
+  transform:translateY(-2px);
+}
+
+.dropdown-panel{
+  display:none;
+  position:absolute;
+  top:calc(100% + 12px);
+  left:0;
+  right:0;
+  background:var(--dropdown-bg);
+  border-radius:14px;
+  box-shadow:var(--dropdown-shadow);
+  padding:12px;
+  z-index:100;
+  border:1.5px solid var(--border);
+  animation:dropDown .25s ease;
+  max-height:420px;
+  overflow-y:auto;
+}
+.menu-dropdown-wrapper.open .dropdown-panel{display:block;}
+@keyframes dropDown{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
+
+.dropdown-header{
+  padding:8px 12px 12px;
+  font-size:11px;
+  color:var(--text-muted);
+  text-transform:uppercase;
+  letter-spacing:1px;
+  font-weight:700;
+  border-bottom:1px solid var(--border);
+  margin-bottom:8px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.dropdown-header .close-btn{
+  background:transparent;border:none;color:var(--text-muted);
+  cursor:pointer;font-size:14px;padding:4px 8px;border-radius:6px;
+  transition:.2s;
+}
+.dropdown-header .close-btn:hover{background:var(--sub-bg);color:var(--red);}
+
+.dropdown-item{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 14px;
+  border-radius:10px;
+  cursor:pointer;
+  transition:.15s;
+  text-decoration:none;
+  color:var(--text);
+  border:1.5px solid transparent;
+}
+.dropdown-item:hover{
+  background:var(--blue-light);
+  border-color:var(--link-color);
+}
+.dropdown-item .item-ico{
+  width:36px;height:36px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:16px;flex-shrink:0;
+}
+.dropdown-item .item-text{flex:1;min-width:0;}
+.dropdown-item .item-text .title{
+  font-size:14px;font-weight:700;color:var(--text);
+  margin-bottom:2px;
+}
+.dropdown-item .item-text .desc{
+  font-size:11px;color:var(--text-muted);
+}
+.dropdown-item .item-arrow{
+  color:var(--border);font-size:14px;transition:.2s;
+}
+.dropdown-item:hover .item-arrow{
+  color:var(--link-color);
+  transform:translateX(3px);
+}
+
+.dropdown-footer{
+  padding:12px 14px 8px;
+  border-top:1px solid var(--border);
+  margin-top:8px;
+}
+.btn-show-all{
+  width:100%;padding:11px;border-radius:10px;
+  background:linear-gradient(135deg,#1e5fa8,#154a82);
+  color:#fff;border:none;font-weight:700;font-size:13px;
+  cursor:pointer;font-family:inherit;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:.2s;
+  text-decoration:none;
+}
+.btn-show-all:hover{filter:brightness(1.15);transform:translateY(-1px);}
+
+/* Color variants */
+.ico-transportasi{background:linear-gradient(135deg,#1e5fa8,#154a82);}
+.ico-makanan{background:linear-gradient(135deg,#d9534f,#c9302c);}
+.ico-wisata{background:linear-gradient(135deg,#2fa36b,#1f7f53);}
+.ico-keluarga{background:linear-gradient(135deg,#7c4dff,#5e35b1);}
+.ico-sekolah{background:linear-gradient(135deg,#f0ad4e,#ec971f);}
+.ico-tubuh{background:linear-gradient(135deg,#26a69a,#00796b);}
+.ico-pakaian{background:linear-gradient(135deg,#e91e63,#c2185b);}
+.ico-alam{background:linear-gradient(135deg,#00bcd4,#0097a7);}
+.ico-pekerjaan{background:linear-gradient(135deg,#607d8b,#455a64);}
+.ico-hobi{background:linear-gradient(135deg,#ff9800,#f57c00);}
+.ico-umum{background:linear-gradient(135deg,#9e9e9e,#616161);}
+
 .modal-back{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;align-items:center;justify-content:center;padding:20px;}
 .modal-back.show{display:flex;}
 .modal-box{background:var(--card-bg);border-radius:14px;padding:28px;max-width:480px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.4);max-height:90vh;overflow-y:auto;}
@@ -111,6 +234,7 @@ body{background:var(--bg);min-height:100vh;color:var(--text);transition:backgrou
   .topbar .user{display:none;}
   .quick-stats{grid-template-columns:1fr;}
   .quota-banner{padding:16px;}
+  .dropdown-panel{position:fixed;top:auto;bottom:0;left:0;right:0;border-radius:20px 20px 0 0;max-height:70vh;}
 }
 </style>
 </head>
@@ -208,12 +332,31 @@ body{background:var(--bg);min-height:100vh;color:var(--text);transition:backgrou
       <p>Latihan lengkap sesuai standar ujian</p>
       <i class="fas fa-chevron-right arrow"></i>
     </a>
-    <a class="menu exam-menu" href="kosakata.html">
-      <div class="ico ico-green"><i class="fas fa-book"></i></div>
-      <h3>Kosakata</h3>
-      <p>Latihan perbendaharaan kata Korea</p>
-      <i class="fas fa-chevron-right arrow"></i>
-    </a>
+
+    <!-- KOSAKATA dengan DROPDOWN -->
+    <div class="menu-dropdown-wrapper" id="kosakataWrapper">
+      <div class="menu exam-menu menu-with-chevron" onclick="toggleKosakataDropdown(event)">
+        <div class="ico ico-green"><i class="fas fa-book"></i></div>
+        <h3>Kosakata</h3>
+        <p>Pilih tema kosakata yang mau dipelajari</p>
+        <i class="fas fa-chevron-down chevron"></i>
+      </div>
+      <div class="dropdown-panel" id="kosakataDropdown">
+        <div class="dropdown-header">
+          <span>📚 Pilih Tema Kosakata</span>
+          <button class="close-btn" onclick="closeKosakataDropdown(event)"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="temaListBox">
+          <!-- Akan diisi via JavaScript -->
+        </div>
+        <div class="dropdown-footer">
+          <a href="kosakata.html?tema=semua" class="btn-show-all">
+            <i class="fas fa-globe"></i> Semua Tema (Campur)
+          </a>
+        </div>
+      </div>
+    </div>
+
     <a class="menu exam-menu" href="ujian.html?kategori=tata_bahasa">
       <div class="ico ico-orange"><i class="fas fa-spell-check"></i></div>
       <h3>Tata Bahasa</h3>
@@ -282,7 +425,24 @@ function toggleTheme(){
 }
 applyTheme(localStorage.getItem('theme') || 'light');
 
-const API = 'https://script.google.com/macros/s/AKfycbw4Cr9QZTpNznxAWBed0Nt0KBsiyb2JSfKw-aADolR01SIoUcf8c370pvaKFHiaEpmb/exec';
+const API = 'https://script.google.com/macros/s/AKfycbx58rhLwaHCDxRlrAy6mDeSKLFat0hHcwW565Sj66taWCJZL4CE-vCnwsuK44Iw7FHR/exec';
+
+// ===== DAFTAR TEMA KOSAKATA =====
+// Tinggal tambah di sini kalau mau nambah tema baru
+// Note: value = kode kategori yang dipakai di sheet & URL
+const TEMA_KOSAKATA = [
+  { value: 'transportasi',   label: 'Transportasi',     desc: 'Bus, kereta, taksi, dll',    icon: 'fa-bus',          icoClass: 'ico-transportasi' },
+  { value: 'makanan',        label: 'Makanan & Minuman', desc: 'Kimchi, bibimbap, kopi, dll', icon: 'fa-utensils',     icoClass: 'ico-makanan' },
+  { value: 'tempat_wisata',  label: 'Tempat Wisata',    desc: 'Namsan, Gyeongbokgung, dll', icon: 'fa-landmark',     icoClass: 'ico-wisata' },
+  { value: 'keluarga',       label: 'Keluarga',         desc: 'Ayah, ibu, kakak, adik',     icon: 'fa-users',        icoClass: 'ico-keluarga' },
+  { value: 'sekolah',        label: 'Sekolah',          desc: 'Buku, guru, kelas, dll',     icon: 'fa-graduation-cap', icoClass: 'ico-sekolah' },
+  { value: 'tubuh',          label: 'Anggota Tubuh',    desc: 'Kepala, tangan, kaki',       icon: 'fa-hand-paper',   icoClass: 'ico-tubuh' },
+  { value: 'pakaian',        label: 'Pakaian',          desc: 'Baju, celana, sepatu',       icon: 'fa-tshirt',       icoClass: 'ico-pakaian' },
+  { value: 'alam',           label: 'Alam & Cuaca',     desc: 'Hujan, matahari, gunung',    icon: 'fa-cloud-sun',    icoClass: 'ico-alam' },
+  { value: 'pekerjaan',      label: 'Pekerjaan',        desc: 'Dokter, guru, polisi',       icon: 'fa-briefcase',    icoClass: 'ico-pekerjaan' },
+  { value: 'hobi',           label: 'Hobi & Olahraga',  desc: 'Sepakbola, musik, baca',     icon: 'fa-futbol',       icoClass: 'ico-hobi' },
+  { value: 'umum',           label: 'Kosakata Umum',    desc: 'Campuran semua kategori',    icon: 'fa-book',         icoClass: 'ico-umum' }
+];
 
 let user = JSON.parse(localStorage.getItem('user') || 'null');
 if (!user) location.href = 'login.html';
@@ -290,7 +450,6 @@ if (!user) location.href = 'login.html';
 document.getElementById('userName').textContent = user.nama || user.username;
 document.getElementById('greetName').textContent = user.nama || user.username;
 
-// Avatar
 const avBox = document.getElementById('avatarBox');
 if (user.foto) {
   avBox.innerHTML = `<img src="${user.foto}" class="avatar-mini" onerror="this.style.display='none'">`;
@@ -309,6 +468,61 @@ if (user.role === 'admin') {
   badge.className = 'badge user';
 }
 
+// ===== RENDER DROPDOWN KOSAKATA =====
+function renderTemaList() {
+  const box = document.getElementById('temaListBox');
+  let html = '';
+  TEMA_KOSAKATA.forEach(t => {
+    html += `
+      <a class="dropdown-item" href="kosakata.html?tema=${t.value}">
+        <div class="item-ico ${t.icoClass}">
+          <i class="fas ${t.icon}"></i>
+        </div>
+        <div class="item-text">
+          <div class="title">${t.label}</div>
+          <div class="desc">${t.desc}</div>
+        </div>
+        <i class="fas fa-chevron-right item-arrow"></i>
+      </a>`;
+  });
+  box.innerHTML = html;
+}
+
+// ===== DROPDOWN CONTROL =====
+function toggleKosakataDropdown(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  const wrapper = document.getElementById('kosakataWrapper');
+  const isOpen = wrapper.classList.contains('open');
+
+  // Tutup dropdown lain dulu
+  document.querySelectorAll('.menu-dropdown-wrapper.open').forEach(w => w.classList.remove('open'));
+
+  if (!isOpen) {
+    wrapper.classList.add('open');
+  }
+}
+
+function closeKosakataDropdown(e) {
+  if (e) e.stopPropagation();
+  document.getElementById('kosakataWrapper').classList.remove('open');
+}
+
+// Tutup dropdown kalau klik di luar
+document.addEventListener('click', function(e) {
+  const wrapper = document.getElementById('kosakataWrapper');
+  if (wrapper && !wrapper.contains(e.target)) {
+    wrapper.classList.remove('open');
+  }
+});
+
+// Tutup dropdown kalau tekan ESC
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.menu-dropdown-wrapper.open').forEach(w => w.classList.remove('open'));
+  }
+});
+
 // ===== NOTIF BADGE =====
 function updateNotifBadge() {
   fetch(API + '?action=getUnreadCount&username=' + encodeURIComponent(user.username) + '&t=' + Date.now())
@@ -326,8 +540,6 @@ function updateNotifBadge() {
     })
     .catch(() => {});
 }
-
-// Auto refresh badge tiap 30 detik
 setInterval(updateNotifBadge, 30000);
 
 // ===== KUOTA =====
@@ -459,7 +671,8 @@ function logout(e) {
   location.href = 'login.html';
 }
 
-// INIT
+// ===== INIT =====
+renderTemaList();
 updateQuotaUI();
 refreshQuota();
 updateNotifBadge();
