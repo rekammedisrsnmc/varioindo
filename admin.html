@@ -108,6 +108,7 @@ body{background:var(--bg);min-height:100vh;color:var(--text);transition:backgrou
 .q-item .info .meta .tag.img{background:#e8f5ee;color:#1f7f53;}
 .q-item .info .meta .tag.ans{background:#fff5e0;color:#8a6a1a;}
 .q-item .info .meta .tag.kat{background:#e8e0fa;color:#5e35b1;}
+.q-item .info .meta .tag.tema{background:#e0f2f1;color:#00695c;}
 .q-item .thumb{width:60px;height:60px;object-fit:cover;border-radius:6px;flex-shrink:0;}
 .q-item .btns{display:flex;flex-direction:column;gap:6px;flex-shrink:0;}
 .jawaban-radios{display:flex;gap:10px;flex-wrap:wrap;}
@@ -162,7 +163,6 @@ input:checked + .slider:before{transform:translateX(24px);}
 .config-row .info .title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px;}
 .config-row .info .desc{font-size:12px;color:var(--text-muted);}
 
-/* Tiket */
 .ticket-box{border:1.5px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px;background:var(--card-bg);transition:.2s;}
 .ticket-box:hover{border-color:var(--blue);}
 .ticket-box.status-open{border-left:5px solid var(--red);}
@@ -227,6 +227,7 @@ input:checked + .slider:before{transform:translateX(24px);}
     <div class="card">
       <h2><i class="fas fa-plus-circle"></i> <span id="formTitle">Tambah Soal Baru</span></h2>
       <input type="hidden" id="editId" value="">
+
       <div class="row-2">
         <div class="form-group">
           <label>Tipe Soal <span class="req">*</span></label>
@@ -237,10 +238,10 @@ input:checked + .slider:before{transform:translateX(24px);}
           </select>
         </div>
         <div class="form-group">
-          <label>Kategori <span class="req">*</span></label>
-          <select id="kategori">
+          <label>Kategori Utama <span class="req">*</span></label>
+          <select id="kategoriUtama" onchange="onKategoriChange()">
             <option value="eps">Soal EPS-TOPIK</option>
-            <option value="kosakata">Kosakata</option>
+            <option value="kosakata">Kosakata (pilih tema di bawah)</option>
             <option value="tata_bahasa">Tata Bahasa</option>
             <option value="listening">Listening</option>
             <option value="reading">Reading</option>
@@ -248,10 +249,30 @@ input:checked + .slider:before{transform:translateX(24px);}
           </select>
         </div>
       </div>
+
+      <div class="form-group" id="temaGroup" style="display:none;">
+        <label>Tema Kosakata <span class="req">*</span></label>
+        <select id="temaKategori">
+          <option value="transportasi">🚌 Transportasi</option>
+          <option value="makanan">🍜 Makanan & Minuman</option>
+          <option value="tempat_wisata">🏛️ Tempat Wisata</option>
+          <option value="keluarga">👨‍👩‍👧 Keluarga</option>
+          <option value="sekolah">🎓 Sekolah</option>
+          <option value="tubuh">💪 Anggota Tubuh</option>
+          <option value="pakaian">👕 Pakaian</option>
+          <option value="alam">🌤️ Alam & Cuaca</option>
+          <option value="pekerjaan">💼 Pekerjaan</option>
+          <option value="hobi">⚽ Hobi & Olahraga</option>
+          <option value="umum">📚 Kosakata Umum</option>
+        </select>
+        <div class="hint">Tema ini menentukan dropdown di dashboard user</div>
+      </div>
+
       <div class="form-group">
         <label>Soal / Pertanyaan</label>
         <textarea id="soal" placeholder="Tulis soal di sini..."></textarea>
       </div>
+
       <div class="row-2">
         <div class="form-group">
           <label>Gambar Soal</label>
@@ -276,6 +297,7 @@ input:checked + .slider:before{transform:translateX(24px);}
           <input type="hidden" id="audioUrl" value="">
         </div>
       </div>
+
       <div id="optionsBox">
         <div class="row-4">
           <div class="form-group"><label>① Opsi 1</label><input type="text" id="opsiA"></div>
@@ -284,6 +306,7 @@ input:checked + .slider:before{transform:translateX(24px);}
           <div class="form-group"><label>④ Opsi 4</label><input type="text" id="opsiD"></div>
         </div>
       </div>
+
       <div class="form-group">
         <label>Jawaban Benar <span class="req">*</span></label>
         <div class="jawaban-radios" id="jawabanRadios">
@@ -296,10 +319,12 @@ input:checked + .slider:before{transform:translateX(24px);}
           <input type="text" id="jawabanIsian" placeholder="Ketik jawaban benar...">
         </div>
       </div>
+
       <div class="form-group">
         <label>Pembahasan (opsional)</label>
         <textarea id="pembahasan" placeholder="Penjelasan jawaban..."></textarea>
       </div>
+
       <div class="actions">
         <button class="btn btn-primary" id="saveBtn" onclick="saveSoal()"><i class="fas fa-save"></i> <span id="saveBtnText">Simpan Soal</span></button>
         <button class="btn btn-secondary" onclick="resetForm()"><i class="fas fa-undo"></i> Reset</button>
@@ -307,18 +332,33 @@ input:checked + .slider:before{transform:translateX(24px);}
         <button class="btn btn-danger" onclick="clearAll()"><i class="fas fa-trash"></i> Hapus Semua</button>
       </div>
     </div>
+
     <div class="card">
       <h2><i class="fas fa-list"></i> Daftar Soal (<span id="totalSoal">0</span>)</h2>
       <div class="form-group">
         <label>Filter Kategori</label>
         <select id="filterKategori" onchange="renderList()">
           <option value="">Semua Kategori</option>
-          <option value="eps">Soal EPS-TOPIK</option>
-          <option value="kosakata">Kosakata</option>
-          <option value="tata_bahasa">Tata Bahasa</option>
-          <option value="listening">Listening</option>
-          <option value="reading">Reading</option>
-          <option value="umum">Umum</option>
+          <optgroup label="Umum">
+            <option value="eps">Soal EPS-TOPIK</option>
+            <option value="tata_bahasa">Tata Bahasa</option>
+            <option value="listening">Listening</option>
+            <option value="reading">Reading</option>
+            <option value="umum">Umum</option>
+          </optgroup>
+          <optgroup label="Kosakata — Per Tema">
+            <option value="kosakata_transportasi">🚌 Transportasi</option>
+            <option value="kosakata_makanan">🍜 Makanan</option>
+            <option value="kosakata_tempat_wisata">🏛️ Tempat Wisata</option>
+            <option value="kosakata_keluarga">👨‍👩‍👧 Keluarga</option>
+            <option value="kosakata_sekolah">🎓 Sekolah</option>
+            <option value="kosakata_tubuh">💪 Anggota Tubuh</option>
+            <option value="kosakata_pakaian">👕 Pakaian</option>
+            <option value="kosakata_alam">🌤️ Alam & Cuaca</option>
+            <option value="kosakata_pekerjaan">💼 Pekerjaan</option>
+            <option value="kosakata_hobi">⚽ Hobi & Olahraga</option>
+            <option value="kosakata_umum">📚 Kosakata Umum</option>
+          </optgroup>
         </select>
       </div>
       <div id="listBox">
@@ -577,7 +617,7 @@ function toggleTheme(){
 }
 applyTheme(localStorage.getItem('theme') || 'light');
 
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw4Cr9QZTpNznxAWBed0Nt0KBsiyb2JSfKw-aADolR01SIoUcf8c370pvaKFHiaEpmb/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx58rhLwaHCDxRlrAy6mDeSKLFat0hHcwW565Sj66taWCJZL4CE-vCnwsuK44Iw7FHR/exec';
 
 const _user = JSON.parse(localStorage.getItem('user') || 'null');
 if (!_user) location.href = 'login.html';
@@ -616,6 +656,22 @@ function switchTab(tab) {
 
 function openModal(id) { document.getElementById(id).classList.add('show'); }
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+// ===== KATEGORI + TEMA =====
+function onKategoriChange() {
+  const utama = document.getElementById('kategoriUtama').value;
+  const temaGroup = document.getElementById('temaGroup');
+  temaGroup.style.display = (utama === 'kosakata') ? 'block' : 'none';
+}
+
+function getFinalKategori() {
+  const utama = document.getElementById('kategoriUtama').value;
+  if (utama === 'kosakata') {
+    const tema = document.getElementById('temaKategori').value;
+    return 'kosakata_' + tema;
+  }
+  return utama;
+}
 
 // ===== SOAL =====
 function onSectionChange() {
@@ -705,6 +761,23 @@ function loadData() {
     .finally(() => { isLoading = false; });
 }
 
+function getTemaLabel(kategori) {
+  const map = {
+    'kosakata_transportasi': '🚌 Transportasi',
+    'kosakata_makanan': '🍜 Makanan',
+    'kosakata_tempat_wisata': '🏛️ Tempat Wisata',
+    'kosakata_keluarga': '👨‍👩‍👧 Keluarga',
+    'kosakata_sekolah': '🎓 Sekolah',
+    'kosakata_tubuh': '💪 Tubuh',
+    'kosakata_pakaian': '👕 Pakaian',
+    'kosakata_alam': '🌤️ Alam',
+    'kosakata_pekerjaan': '💼 Pekerjaan',
+    'kosakata_hobi': '⚽ Hobi',
+    'kosakata_umum': '📚 Umum'
+  };
+  return map[kategori] || kategori;
+}
+
 function renderList() {
   const box = document.getElementById('listBox');
   const filter = document.getElementById('filterKategori').value;
@@ -721,7 +794,10 @@ function renderList() {
     if (q.gambar) tags.push('<span class="tag img"><i class="fas fa-image"></i> Gambar</span>');
     if (q.audio)  tags.push('<span class="tag audio"><i class="fas fa-volume-up"></i> Audio</span>');
     tags.push(`<span class="tag">${q.section === 'isian' ? 'Isian' : 'Pilihan'}</span>`);
-    if (q.kategori) tags.push(`<span class="tag kat"><i class="fas fa-folder"></i> ${q.kategori}</span>`);
+    if (q.kategori) {
+      const isKosakata = String(q.kategori).toLowerCase().startsWith('kosakata_');
+      tags.push(`<span class="tag ${isKosakata ? 'tema' : 'kat'}"><i class="fas fa-folder"></i> ${getTemaLabel(q.kategori)}</span>`);
+    }
     const jawabDisplay = (q.section === 'isian') ? q.jawaban : (CIRCLES[q.jawaban] || q.jawaban);
     tags.push(`<span class="tag ans">Jawaban: ${jawabDisplay}</span>`);
     const thumb = q.gambar ? `<img src="${q.gambar}" class="thumb" onerror="this.style.display='none'">` : '';
@@ -746,7 +822,7 @@ function renderList() {
 async function saveSoal() {
   const soal = document.getElementById('soal').value.trim();
   const section = document.getElementById('section').value;
-  const kategori = document.getElementById('kategori').value;
+  const kategori = getFinalKategori();
   const opsiA = document.getElementById('opsiA').value.trim();
   const opsiB = document.getElementById('opsiB').value.trim();
   const opsiC = document.getElementById('opsiC').value.trim();
@@ -802,7 +878,22 @@ function editSoal(i) {
   const q = data[i];
   document.getElementById('editId').value = i;
   document.getElementById('section').value = q.section || 'pilihan_teks';
-  document.getElementById('kategori').value = q.kategori || 'umum';
+
+  // Parse kategori untuk dropdown utama + tema
+  const qKat = String(q.kategori || 'umum').toLowerCase();
+  let utamaKat = qKat;
+  let temaKat = 'umum';
+  if (qKat.startsWith('kosakata_')) {
+    utamaKat = 'kosakata';
+    temaKat = qKat.replace('kosakata_', '');
+  } else if (qKat === 'kosakata') {
+    utamaKat = 'kosakata';
+    temaKat = 'umum';
+  }
+  document.getElementById('kategoriUtama').value = utamaKat;
+  document.getElementById('temaKategori').value = temaKat;
+  onKategoriChange();
+
   document.getElementById('soal').value = q.soal || '';
   document.getElementById('opsiA').value = q.opsiA || '';
   document.getElementById('opsiB').value = q.opsiB || '';
@@ -840,7 +931,9 @@ function clearAll() {
 function resetForm() {
   document.getElementById('editId').value = '';
   document.getElementById('section').value = 'pilihan_teks';
-  document.getElementById('kategori').value = 'eps';
+  document.getElementById('kategoriUtama').value = 'eps';
+  document.getElementById('temaKategori').value = 'transportasi';
+  onKategoriChange();
   document.getElementById('soal').value = '';
   document.getElementById('opsiA').value = '';
   document.getElementById('opsiB').value = '';
@@ -1328,10 +1421,10 @@ function logoutAdmin(e) {
 
 // ===== INIT =====
 onSectionChange();
+onKategoriChange();
 loadData();
 updateNotifBadge();
 
-// Cek request pending
 fetch(APPS_SCRIPT_URL + '?action=getRequests&status=pending&adminUsername=' + encodeURIComponent(_user.username) + '&t=' + Date.now())
   .then(r => r.json())
   .then(res => {
@@ -1343,7 +1436,6 @@ fetch(APPS_SCRIPT_URL + '?action=getRequests&status=pending&adminUsername=' + en
   })
   .catch(() => {});
 
-// Cek ticket open
 fetch(APPS_SCRIPT_URL + '?action=getTickets&username=' + encodeURIComponent(_user.username) + '&isAdmin=true&t=' + Date.now())
   .then(r => r.json())
   .then(res => {
